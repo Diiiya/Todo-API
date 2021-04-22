@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TodoApi.Models;
+using System.Threading.Tasks;
 
 namespace TodoApi.Repositories
 {
@@ -30,31 +31,35 @@ namespace TodoApi.Repositories
             }
         };
 
-        public void CreateUser(User user)
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await Task.FromResult(userList);
+        }
+
+        public async Task<User> GetUserAsync(Guid id)
+        {
+            User user = userList.Where(user => user.Id == id).SingleOrDefault();
+            return await Task.FromResult(user);
+        }
+
+        public async Task CreateUserAsync(User user)
         {
             userList.Add(user);
+            await Task.CompletedTask;
         }
 
-        public void DeleteUser(Guid id)
-        {
-            var index = userList.FindIndex(user => user.Id == id);
-            userList.RemoveAt(index);
-        }
-
-        public List<User> GetAllUsers()
-        {
-            return userList;
-        }
-
-        public User GetUser(Guid id)
-        {
-            return userList.Where(user => user.Id == id).SingleOrDefault();
-        }
-
-        public void UpdateUser(User user)
+        public async Task UpdateUserAsync(User user)
         {
             var index = userList.FindIndex(existingUser => existingUser.Id == user.Id);
             userList[index] = user;
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteUserAsync(Guid id)
+        {
+            var index = userList.FindIndex(user => user.Id == id);
+            userList.RemoveAt(index);
+            await Task.CompletedTask;
         }
     }
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using TodoApi.DTOs;
 using TodoApi.Models;
 using TodoApi.Repositories;
+using System.Threading.Tasks;
 
 namespace TodoApi.Controllers
 {
@@ -19,26 +20,27 @@ namespace TodoApi.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<UserDTO> GetAllUsers()
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
-            return repo.GetAllUsers().Select(user => user.AsDTO());
+            var allUsers = (await repo.GetAllUsersAsync()).Select(user => user.AsDTO());
+            return allUsers;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<UserDTO> GetUser(Guid id)
+        public async Task<ActionResult<UserDTO>> GetUserAsync(Guid id)
         {
-            var user = repo.GetUser(id);
+            var user = await repo.GetUserAsync(id);
 
             if (user is null)
             {
                 return NotFound();
             }
 
-            return user.AsDTO();
+            return Ok(user.AsDTO());
         }
 
         [HttpPost]
-        public ActionResult<UserDTO> CreateUser(CreateUserDTO userDTO)
+        public async Task<ActionResult<UserDTO>> CreateUserAsync(CreateUserDTO userDTO)
         {
             User newUser = new()
             {
@@ -50,15 +52,15 @@ namespace TodoApi.Controllers
                 Deleted = false
             };
 
-            repo.CreateUser(newUser);
+            await repo.CreateUserAsync(newUser);
 
-            return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser.AsDTO());
+            return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
 
         [HttpPut("{id}")]
-        public ActionResult UpdateUser(Guid id, UpdateUserDTO userDTO)
+        public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
-            User existingUser = repo.GetUser(id);
+            User existingUser = await repo.GetUserAsync(id);
 
             if (existingUser is null)
             {
@@ -75,22 +77,22 @@ namespace TodoApi.Controllers
                 Deleted = existingUser.Deleted
             };
 
-            repo.UpdateUser(updatedUser);
+            await repo.UpdateUserAsync(updatedUser);
 
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteUser(Guid id)
+        public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
-            User existingUser = repo.GetUser(id);
+            User existingUser = await repo.GetUserAsync(id);
 
             if (existingUser is null)
             {
                 return NotFound();
             }
 
-            repo.DeleteUser(id);
+            await repo.DeleteUserAsync(id);
 
             return NoContent();
         }

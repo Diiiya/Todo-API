@@ -29,6 +29,11 @@ namespace TodoApi
         {
             services.AddSingleton<IInMemoryUserRepo, InMemoryUserRepo>();
 
+            services.AddControllers(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
