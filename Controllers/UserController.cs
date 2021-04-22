@@ -80,6 +80,19 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id}")]
+        public ActionResult DeleteUser(Guid id)
+        {
+            User existingUser = repo.GetUser(id);
 
+            if (existingUser is null)
+            {
+                return NotFound();
+            }
+
+            repo.DeleteUser(id);
+
+            return NoContent();
+        }
     }
 }
