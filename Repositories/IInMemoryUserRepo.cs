@@ -7,10 +7,10 @@ namespace TodoApi.Repositories
 {
     public interface IInMemoryUserRepo
     {
-        Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<User> GetUserAsync(Guid id);
-        Task CreateUserAsync(User user);
-        Task UpdateUserAsync(User user);
-        Task DeleteUserAsync(Guid id);
+        Task<IEnumerable<User>> GetAll();
+        Task<User> Get(Guid id);
+        Task Add(User user);
+        Task Update(User user);
+        Task Delete(Guid id);
     }
 }
