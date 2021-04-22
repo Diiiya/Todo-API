@@ -8,5 +8,8 @@ namespace TodoApi.Repositories
     {
         List<User> GetAllUsers();
         User GetUser(Guid id);
+        void CreateUser(User user);
+        void UpdateUser(User user);
+        void DeleteUser(Guid id);
     }
 }

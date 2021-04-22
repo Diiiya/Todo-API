@@ -37,6 +37,49 @@ namespace TodoApi.Controllers
             return user.AsDTO();
         }
 
+        [HttpPost]
+        public ActionResult<UserDTO> CreateUser(CreateUserDTO userDTO)
+        {
+            User newUser = new()
+            {
+                Id = Guid.NewGuid(),
+                Username = userDTO.Username,
+                Email = userDTO.Email,
+                Password = userDTO.Password,
+                CreatedDate = DateTimeOffset.UtcNow,
+                Deleted = false
+            };
+
+            repo.CreateUser(newUser);
+
+            return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, newUser.AsDTO());
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult UpdateUser(Guid id, UpdateUserDTO userDTO)
+        {
+            User existingUser = repo.GetUser(id);
+
+            if (existingUser is null)
+            {
+                return NotFound();
+            }
+
+            User updatedUser = existingUser with
+            {
+                Id = existingUser.Id,
+                Username = existingUser.Username,
+                Email = userDTO.Email,
+                Password = userDTO.Password,
+                CreatedDate = existingUser.CreatedDate,
+                Deleted = existingUser.Deleted
+            };
+
+            repo.UpdateUser(updatedUser);
+
+            return NoContent();
+        }
+
 
     }
 }
