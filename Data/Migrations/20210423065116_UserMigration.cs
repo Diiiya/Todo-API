@@ -13,7 +13,7 @@ namespace TodoApi.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
                     CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false)

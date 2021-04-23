@@ -73,7 +73,7 @@ namespace TodoApi
             });
 
             // Should only be called if some static data should be added to the db 
-            // TestData.Initialize(app);
+            TestData.Initialize(app);
         }
     }
 }

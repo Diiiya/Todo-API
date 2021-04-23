@@ -4,7 +4,7 @@ using TodoApi.Models;
 
 namespace TodoApi
 {
-    public static class Extensions
+    public static class ConvertToDTO
     {
         public static UserDTO AsDTO(this User user)
         {
