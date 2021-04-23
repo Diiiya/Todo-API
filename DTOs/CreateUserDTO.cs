@@ -11,7 +11,6 @@ namespace TodoApi.DTOs
         public string Username { get; init; }
 
         [Required]
-        [StringLength(50, MinimumLength = 6)]
         [EmailAddress]
         [DataType(DataType.EmailAddress)]
         public string Email { get; init; }
