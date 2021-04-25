@@ -19,14 +19,22 @@
 - any IDE (we have used Visual Studio Code)
 - Docker - to run a MSSQL container
 - install some packages:
-``` dotnet tool install --global dotnet-ef
+``` 
+dotnet tool install --global dotnet-ef
 dotnet add package Microsoft.EntityFrameworkCore
 dotnet add package Microsoft.EntityFrameworkCore.Relational
 dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-dotnet add package Microsoft.EntityFrameworkCore.Design ```
+dotnet add package Microsoft.EntityFrameworkCore.Design 
+```
 
 ## Create MSSQL DB Docker container:
-``` docker run --name todo-mssql-db -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=R@nd0!mmm" -e "MSSQL_PID=Express" -p 1444:1433 -d microsoft/mssql-server-linux ```
+``` 
+docker run --name todo-mssql-db -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=R@nd0!mmm" -e "MSSQL_PID=Express" -p 1444:1433 -d microsoft/mssql-server-linux 
+```
 where username is sa and password is R@nd0!mmm (as in the Connection String)
 
-If Docker container is running: ``` dotnet-ef database update ``` to generate the database
+If Docker container is running: 
+``` 
+dotnet-ef database update 
+``` 
+to generate the database
