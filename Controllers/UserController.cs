@@ -7,9 +7,17 @@ using TodoApi.Models;
 using TodoApi.Repositories;
 using System.Threading.Tasks;
 using TodoApi.Data.EfCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
 
 namespace TodoApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase
@@ -24,9 +32,13 @@ namespace TodoApi.Controllers
 
         // MSSQL DB
         private readonly EfCoreUserRepository repository;
-        public UserController(EfCoreUserRepository repository)
+        
+        public IConfiguration _configuration;
+
+        public UserController(EfCoreUserRepository repository, IConfiguration configuration)
         {
             this.repository = repository;
+            this._configuration = configuration;
         }
 
         [HttpGet]
@@ -105,6 +117,37 @@ namespace TodoApi.Controllers
             await repository.Delete(id);
 
             return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public async Task<ActionResult> Authenticate([FromBody] CreateUserDTO userCredentials)
+        {
+            IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
+            if(!users.Any(u => (u.Username == userCredentials.Username || u.Email == userCredentials.Email) && u.Password == userCredentials.Password)){
+                return Unauthorized(); //or BadRequest()????
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor{
+                Subject = new ClaimsIdentity(new Claim[]{
+                    new Claim("Username", userCredentials.Username),
+                    new Claim("Email", userCredentials.Email),
+                    new Claim("Password", userCredentials.Password)
+                    }),
+                    Expires = DateTime.UtcNow.AddHours(1), //depending how long we want to keep could be valid for a day
+                    SigningCredentials = 
+                        new SigningCredentials(
+                            new SymmetricSecurityKey(tokenKey), 
+                            SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            // return tokenHandler.WriteToken(token);
+            if(token == null)
+                return Unauthorized();
+            return Ok(tokenHandler.WriteToken(token));
         }
     }
 }
