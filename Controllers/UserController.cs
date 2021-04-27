@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
+using ToDoAPI.PasswordHasher;
 
 namespace TodoApi.Controllers
 {
@@ -32,6 +33,7 @@ namespace TodoApi.Controllers
 
         // MSSQL DB
         private readonly EfCoreUserRepository repository;
+        PasswordHasher passwordHasher = new PasswordHasher();
         
         public IConfiguration _configuration;
 
@@ -69,7 +71,7 @@ namespace TodoApi.Controllers
                 Id = Guid.NewGuid(),
                 Username = userDTO.Username,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                Password = passwordHasher.hashPass(userDTO.Password),
                 CreatedDate = DateTimeOffset.UtcNow,
                 Deleted = false
             };
@@ -94,7 +96,7 @@ namespace TodoApi.Controllers
                 Id = existingUser.Id,
                 Username = existingUser.Username,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                Password = passwordHasher.hashPass(userDTO.Password),
                 CreatedDate = existingUser.CreatedDate,
                 Deleted = existingUser.Deleted
             };
@@ -124,7 +126,7 @@ namespace TodoApi.Controllers
         public async Task<ActionResult> Authenticate([FromBody] CreateUserDTO userCredentials)
         {
             IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
-            if(!users.Any(u => (u.Username == userCredentials.Username || u.Email == userCredentials.Email) && u.Password == userCredentials.Password)){
+            if(!users.Any(u => (u.Username == userCredentials.Username || u.Email == userCredentials.Email) && u.Password == passwordHasher.hashPass(userCredentials.Password))){
                 return Unauthorized(); //or BadRequest()????
             }
 
