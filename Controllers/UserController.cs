@@ -18,7 +18,6 @@ using ToDoAPI.PasswordHasher;
 
 namespace TodoApi.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase
@@ -43,6 +42,7 @@ namespace TodoApi.Controllers
             this._configuration = configuration;
         }
 
+        // [Authorize]
         [HttpGet]
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
@@ -50,6 +50,7 @@ namespace TodoApi.Controllers
             return allUsers;
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserAsync(Guid id)
         {
@@ -81,6 +82,7 @@ namespace TodoApi.Controllers
             return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
@@ -106,6 +108,7 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
@@ -121,6 +124,7 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<ActionResult> Authenticate([FromBody] CreateUserDTO userCredentials)
