@@ -15,7 +15,7 @@ using Microsoft.OpenApi.Models;
 using TodoApi.Data;
 using TodoApi.Data.EfCore;
 using TodoApi.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer; // dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer --version 5.0.5
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -53,7 +53,6 @@ namespace TodoApi
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
             });
 
-            // Authentication with JWT
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -86,7 +85,7 @@ namespace TodoApi
 
             app.UseRouting();
 
-            app.UseAuthentication(); //added for JWT authentication
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

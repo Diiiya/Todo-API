@@ -131,7 +131,7 @@ namespace TodoApi.Controllers
         {
             IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
             if(!users.Any(u => (u.Username == userCredentials.Username || u.Email == userCredentials.Email) && u.Password == passwordHasher.hashPass(userCredentials.Password))){
-                return Unauthorized(); //or BadRequest()????
+                return BadRequest("Sorry something went wrong");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -142,7 +142,7 @@ namespace TodoApi.Controllers
                     new Claim("Email", userCredentials.Email),
                     new Claim("Password", userCredentials.Password)
                     }),
-                    Expires = DateTime.UtcNow.AddHours(1), //depending how long we want to keep could be valid for a day
+                    Expires = DateTime.UtcNow.AddHours(24), 
                     SigningCredentials = 
                         new SigningCredentials(
                             new SymmetricSecurityKey(tokenKey), 
@@ -150,7 +150,6 @@ namespace TodoApi.Controllers
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            // return tokenHandler.WriteToken(token);
             if(token == null)
                 return Unauthorized();
             return Ok(tokenHandler.WriteToken(token));
