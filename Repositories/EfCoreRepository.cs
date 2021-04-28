@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Data;
+using TodoApi.Repositories;
 using TodoApi.Models;
 
 namespace TodoApi
