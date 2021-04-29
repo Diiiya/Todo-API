@@ -15,6 +15,9 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using ToDoAPI.PasswordHasher;
+using ToDoAPI.DTOs;
+using System.Text.Json;
+using ToDoAPI.Models;
 
 namespace TodoApi.Controllers
 {
@@ -33,7 +36,7 @@ namespace TodoApi.Controllers
         // MSSQL DB
         private readonly EfCoreUserRepository repository;
         PasswordHasher passwordHasher = new PasswordHasher();
-        
+
         public IConfiguration _configuration;
 
         public UserController(EfCoreUserRepository repository, IConfiguration configuration)
@@ -127,32 +130,44 @@ namespace TodoApi.Controllers
         [Authorize]
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public async Task<ActionResult> Authenticate([FromBody] CreateUserDTO userCredentials)
+        public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)
         {
             IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
-            if(!users.Any(u => (u.Username == userCredentials.Username || u.Email == userCredentials.Email) && u.Password == passwordHasher.hashPass(userCredentials.Password))){
+            if (!users.Any(u => (u.Username == userCredentials.Login || u.Email == userCredentials.Login) && passwordHasher.VerifyPassword(u.Password, userCredentials.Password) == true))
+            {
                 return BadRequest("Sorry something went wrong");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-            var tokenDescriptor = new SecurityTokenDescriptor{
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
                 Subject = new ClaimsIdentity(new Claim[]{
-                    new Claim("Username", userCredentials.Username),
-                    new Claim("Email", userCredentials.Email),
+                    new Claim("Login", userCredentials.Login),
+                    // new Claim("Email", userCredentials.Email),
                     new Claim("Password", userCredentials.Password)
                     }),
-                    Expires = DateTime.UtcNow.AddHours(24), 
-                    SigningCredentials = 
+                Expires = DateTime.UtcNow.AddHours(24),
+                SigningCredentials =
                         new SigningCredentials(
-                            new SymmetricSecurityKey(tokenKey), 
+                            new SymmetricSecurityKey(tokenKey),
                             SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            if(token == null)
+
+            if (token == null)
                 return Unauthorized();
-            return Ok(tokenHandler.WriteToken(token));
+
+            string myToken = tokenHandler.WriteToken(token);
+            Token myobjT = new()
+            {
+                CreatedToken = myToken
+            };
+            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+            var serialized = JsonSerializer.Serialize(myobjT, _jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
+            return Ok(deserialized);
         }
     }
 }

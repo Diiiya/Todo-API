@@ -19,7 +19,7 @@ namespace ToDoAPI.PasswordHasher
             return hashedPassword;
         }
         
-        public bool VerifyPassword(string enteredPassword, string storedHash)
+        public bool VerifyPassword(string storedHash, string enteredPassword )
         {
             var hashOfEntered = hashPass(enteredPassword);
             return hashOfEntered == storedHash;
