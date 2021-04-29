@@ -9,6 +9,7 @@ namespace TodoApi.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
             builder.Entity<User>()
                 .Property(p => p.Id)
                 .IsRequired();
@@ -21,6 +22,13 @@ namespace TodoApi.Data
             builder.Entity<User>()
                 .Property(p => p.Password).HasMaxLength(40)
                 .IsRequired();
+
+            builder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+            builder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
 
             builder.Entity<User>().ToTable("User");
         }
