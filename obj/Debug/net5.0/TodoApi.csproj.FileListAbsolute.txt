@@ -123,3 +123,4 @@ D:\bachelors\Actual-app\ToDoAPI\obj\Debug\net5.0\ref\TodoApi.dll
 D:\bachelors\Actual-app\ToDoAPI\obj\Debug\net5.0\TodoApi.pdb
 D:\bachelors\Actual-app\ToDoAPI\obj\Debug\net5.0\TodoApi.genruntimeconfig.cache
 D:\bachelors\Actual-app\ToDoAPI\bin\Debug\net5.0\Newtonsoft.Json.dll
+D:\Projects\CSharp\TodoApi\bin\Debug\net5.0\Newtonsoft.Json.dll
