@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
-using ToDoAPI.PasswordHasher;
+using ToDoAPI.Extensions;
 using ToDoAPI.DTOs;
 using System.Text.Json;
 using ToDoAPI.Models;

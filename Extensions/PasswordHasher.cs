@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
-namespace ToDoAPI.PasswordHasher
+namespace ToDoAPI.Extensions
 {
     public class PasswordHasher
     {

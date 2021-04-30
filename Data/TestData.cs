@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TodoApi.Models;
-using ToDoAPI.PasswordHasher;
+using ToDoAPI.Extensions;
 
 namespace TodoApi.Data
 {
