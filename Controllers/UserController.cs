@@ -142,7 +142,6 @@ namespace TodoApi.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]{
                     new Claim("Login", userCredentials.Login),
-                    // new Claim("Email", userCredentials.Email),
                     new Claim("Password", userCredentials.Password)
                     }),
                 Expires = DateTime.UtcNow.AddHours(24),
