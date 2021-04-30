@@ -4,9 +4,18 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using TodoApi.DTOs;
 using TodoApi.Models;
-using TodoApi.Repositories;
 using System.Threading.Tasks;
 using TodoApi.Data.EfCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
+using ToDoAPI.Extensions;
+using ToDoAPI.DTOs;
+using System.Text.Json;
+using ToDoAPI.Models;
 
 namespace TodoApi.Controllers
 {
@@ -24,11 +33,17 @@ namespace TodoApi.Controllers
 
         // MSSQL DB
         private readonly EfCoreUserRepository repository;
-        public UserController(EfCoreUserRepository repository)
+        PasswordHasher passwordHasher = new PasswordHasher();
+
+        public IConfiguration _configuration;
+
+        public UserController(EfCoreUserRepository repository, IConfiguration configuration)
         {
             this.repository = repository;
+            this._configuration = configuration;
         }
 
+        // [Authorize]
         [HttpGet]
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
@@ -36,6 +51,7 @@ namespace TodoApi.Controllers
             return allUsers;
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserAsync(Guid id)
         {
@@ -57,7 +73,7 @@ namespace TodoApi.Controllers
                 Id = Guid.NewGuid(),
                 Username = userDTO.Username,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                Password = passwordHasher.hashPass(userDTO.Password),
                 CreatedDate = DateTimeOffset.UtcNow,
                 Deleted = false
             };
@@ -67,6 +83,7 @@ namespace TodoApi.Controllers
             return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
@@ -82,7 +99,7 @@ namespace TodoApi.Controllers
                 Id = existingUser.Id,
                 Username = existingUser.Username,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                Password = passwordHasher.hashPass(userDTO.Password),
                 CreatedDate = existingUser.CreatedDate,
                 Deleted = existingUser.Deleted
             };
@@ -92,6 +109,7 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
@@ -105,6 +123,48 @@ namespace TodoApi.Controllers
             await repository.Delete(id);
 
             return NoContent();
+        }
+
+        [Authorize]
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)
+        {
+            IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
+            if (!users.Any(u => (u.Username == userCredentials.Login || u.Email == userCredentials.Login) && passwordHasher.VerifyPassword(u.Password, userCredentials.Password) == true))
+            {
+                return BadRequest("Sorry something went wrong");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]{
+                    new Claim("Login", userCredentials.Login),
+                    new Claim("Password", userCredentials.Password)
+                    }),
+                Expires = DateTime.UtcNow.AddHours(24),
+                SigningCredentials =
+                        new SigningCredentials(
+                            new SymmetricSecurityKey(tokenKey),
+                            SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            if (token == null)
+                return Unauthorized();
+
+            string myToken = tokenHandler.WriteToken(token);
+            Token myobjT = new()
+            {
+                CreatedToken = myToken
+            };
+            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+            var serialized = JsonSerializer.Serialize(myobjT, _jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
+            return Ok(deserialized);
         }
     }
 }

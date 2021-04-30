@@ -20,7 +20,7 @@ namespace TodoApi.Data
                 .Property(p => p.Email)
                 .IsRequired();
             builder.Entity<User>()
-                .Property(p => p.Password).HasMaxLength(40)
+                .Property(p => p.Password).HasMaxLength(100)
                 .IsRequired();
 
             builder.Entity<User>()

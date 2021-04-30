@@ -4,12 +4,14 @@ using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using TodoApi.Models;
+using ToDoAPI.Extensions;
 
 namespace TodoApi.Data
 {
     // This adds some static data to the database 
     public class TestData
     {
+        static PasswordHasher passwordHasher = new PasswordHasher();
         public static void Initialize(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
@@ -35,7 +37,7 @@ namespace TodoApi.Data
                     Id = Guid.NewGuid(),
                     Username = "User1",
                     Email = "user1@mail.com",
-                    Password = "Cvb123",
+                    Password = passwordHasher.hashPass("Cvb123"),
                     CreatedDate = DateTimeOffset.UtcNow,
                     Deleted = false
                 },
@@ -44,7 +46,7 @@ namespace TodoApi.Data
                     Id = Guid.NewGuid(),
                     Username = "User2",
                     Email = "user2@mail.com",
-                    Password = "op[098",
+                    Password = passwordHasher.hashPass("op[098"),
                     CreatedDate = DateTimeOffset.UtcNow,
                     Deleted = false
                 }
