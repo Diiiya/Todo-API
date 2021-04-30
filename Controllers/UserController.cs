@@ -78,9 +78,15 @@ namespace TodoApi.Controllers
                 Deleted = false
             };
 
-            await repository.Add(newUser);
+            var myCreatedEntity = await repository.Add(newUser);
 
-            return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
+            Token myObjT = CreateToken(newUser.Username, newUser.Password);
+            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+            var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
+
+            return Ok(deserialized);//CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
+
         }
 
         [Authorize]
@@ -135,14 +141,24 @@ namespace TodoApi.Controllers
             {
                 return BadRequest("Sorry something went wrong");
             }
+            Token myObjT = CreateToken(userCredentials.Login, userCredentials.Password);
+            if (myObjT is null)
+                return Unauthorized();
+            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+            var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
+            return Ok(deserialized);
+        }
 
+        private Token CreateToken(String login, String password)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]{
-                    new Claim("Login", userCredentials.Login),
-                    new Claim("Password", userCredentials.Password)
+                    new Claim("Login", login),
+                    new Claim("Password", password)
                     }),
                 Expires = DateTime.UtcNow.AddHours(24),
                 SigningCredentials =
@@ -153,18 +169,14 @@ namespace TodoApi.Controllers
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            if (token == null)
-                return Unauthorized();
 
             string myToken = tokenHandler.WriteToken(token);
             Token myobjT = new()
             {
                 CreatedToken = myToken
             };
-            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-            var serialized = JsonSerializer.Serialize(myobjT, _jsonOptions);
-            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
-            return Ok(deserialized);
+
+            return myobjT;
         }
     }
 }
