@@ -1,13 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TodoApi.DTOs
+namespace ToDoAPI.DTOs
 {
-    public record UpdateUserDTO
+    public record LoginUserDTO
     {
         [Required]
-        [EmailAddress]
-        [DataType(DataType.EmailAddress)]
-        public string Email { get; init; }
+        public string Login { get; init; }
 
         [Required]
         [StringLength(100, MinimumLength = 6)]
