@@ -10,7 +10,7 @@ using TodoApi.Data;
 namespace TodoApi.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210429092220_UserMigrations")]
+    [Migration("20210430174954_UserMigrations")]
     partial class UserMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,8 +39,8 @@ namespace TodoApi.Data.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Username")
                         .IsRequired()
