@@ -34,6 +34,8 @@ namespace TodoApi
             );
 
             services.AddScoped<EfCoreUserRepository>();
+            services.AddScoped<EfCoreToDoRepository>();
+            services.AddScoped<EfCoreTagRepository>();
 
             services.AddControllers(options =>
             {

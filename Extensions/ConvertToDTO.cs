@@ -16,5 +16,27 @@ namespace TodoApi
                 Password = user.Password
             };
         }
+
+        public static ToDoDTO ToDoAsDTO(this ToDo todo)
+        {
+            return new ToDoDTO
+            {
+                Id = todo.Id,
+                Description = todo.Description,
+                Date = todo.Date,
+                Done = todo.Done
+                //rest?
+            };
+        }
+
+        public static TagDTO TagAsDTO(this Tag tag)
+        {
+            return new TagDTO
+            {
+                Id = tag.Id,
+                TagName = tag.TagName,
+                //rest?
+            };
+        }
     }
 }

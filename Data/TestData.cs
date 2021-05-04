@@ -23,8 +23,14 @@ namespace TodoApi.Data
                     return;
 
                 var users = TestData.GetAllUsers().ToArray();
+                var tags = TestData.GetAllTags().ToArray();
+                var todos = TestData.GetAllToDos().ToArray();
                 context.User.AddRange(users);
                 context.SaveChanges();
+                context.Tag.AddRange(tags);
+                context.SaveChanges();
+                context.ToDo.AddRange(todos);
+                context.SaveChanges(); // can i save only once or for each i should?
             }
         }
 
@@ -52,6 +58,58 @@ namespace TodoApi.Data
                 }
             };
             return userList;
+        }
+
+        public static List<ToDo> GetAllToDos()
+        {
+            List<ToDo> todoList = new()
+            {
+                new ToDo
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Do laundry",
+                    Date = DateTimeOffset.UtcNow.Date,
+                    Time = DateTimeOffset.UtcNow,
+                    Location = "Copenhagen",
+                    Done = false,
+                    Priority = 2,
+                    FkTagId = Guid.NewGuid(), //here should be tag id 
+                    FkUserId = Guid.NewGuid() //here should be user id 
+                },
+                new ToDo
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Clean the room",
+                    Date = DateTimeOffset.UtcNow.Date,
+                    Time = DateTimeOffset.UtcNow,
+                    Location = "Roskilde",
+                    Done = false,
+                    Priority = 1,
+                    FkTagId = Guid.NewGuid(), //here should be tag id 
+                    FkUserId = Guid.NewGuid() //here should be user id 
+                }
+            };
+            return todoList;
+        }
+
+        public static List<Tag> GetAllTags()
+        {
+            List<Tag> tagList = new()
+            {
+                new Tag
+                {
+                    Id = Guid.NewGuid(),
+                    TagName = "Room",
+                    TagColor = "Yellow"
+                },
+                new Tag
+                {
+                    Id = Guid.NewGuid(),
+                    TagName = "Household",
+                    TagColor = "Red"
+                }
+            };
+            return tagList;
         }
     }
 }
