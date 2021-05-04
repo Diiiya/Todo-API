@@ -131,19 +131,24 @@ namespace TodoApi.Controllers
         public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)
         {
             IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
-            if (!users.Any(u => (u.Username == userCredentials.Login || u.Email == userCredentials.Login) && passwordHasher.VerifyPassword(u.Password, userCredentials.Password) == true))
+
+            var authenticatedUser = users.FirstOrDefault(u =>
+                (u.Username == userCredentials.Login || u.Email == userCredentials.Login) &&
+                (passwordHasher.VerifyPassword(u.Password, userCredentials.Password) == true));
+
+            if (authenticatedUser == null)
             {
-                return BadRequest("Sorry something went wrong");
+                return BadRequest("Wrong credentials!");
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]{
-                    new Claim("Login", userCredentials.Login),
-                    new Claim("Password", userCredentials.Password)
-                    }),
+                Subject = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, authenticatedUser.Id.ToString())
+            }),
                 Expires = DateTime.UtcNow.AddHours(24),
                 SigningCredentials =
                         new SigningCredentials(
