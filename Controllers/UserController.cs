@@ -80,7 +80,7 @@ namespace TodoApi.Controllers
 
             var myCreatedEntity = await repository.Add(newUser);
 
-            Token myObjT = CreateToken(newUser.Username, newUser.Password);
+            Token myObjT = CreateToken(newUser.Id);
             JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
             var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
             var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
@@ -137,11 +137,16 @@ namespace TodoApi.Controllers
         public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)
         {
             IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
-            if (!users.Any(u => (u.Username == userCredentials.Login || u.Email == userCredentials.Login) && passwordHasher.VerifyPassword(u.Password, userCredentials.Password) == true))
+
+            var authenticatedUser = users.FirstOrDefault(u =>
+                (u.Username == userCredentials.Login || u.Email == userCredentials.Login) &&
+                (passwordHasher.VerifyPassword(u.Password, userCredentials.Password) == true));
+
+            if (authenticatedUser == null)
             {
-                return BadRequest("Sorry something went wrong");
+                return BadRequest("Wrong credentials!");
             }
-            Token myObjT = CreateToken(userCredentials.Login, userCredentials.Password);
+            Token myObjT = CreateToken(authenticatedUser.Id);
             if (myObjT is null)
                 return Unauthorized();
             JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
@@ -150,16 +155,16 @@ namespace TodoApi.Controllers
             return Ok(deserialized);
         }
 
-        private Token CreateToken(String login, String password)
+        private Token CreateToken(Guid userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]{
-                    new Claim("Login", login),
-                    new Claim("Password", password)
-                    }),
+                Subject = new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            }),
                 Expires = DateTime.UtcNow.AddHours(24),
                 SigningCredentials =
                         new SigningCredentials(
