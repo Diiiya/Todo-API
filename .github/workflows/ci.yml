@@ -21,7 +21,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore # --configuration Release
-      working-directory: .\Todo-API 
+#       working-directory: .\Todo-API 
 #     - name: Test
 #       run: dotnet test --no-build --verbosity normal
 #       working-directory: .\Todo-API 
