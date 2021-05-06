@@ -6,17 +6,6 @@ using TodoApi.DTOs;
 using TodoApi.Models;
 using System.Threading.Tasks;
 using TodoApi.Data.EfCore;
-using Microsoft.AspNetCore.Authorization;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
-using ToDoAPI.Extensions;
-using ToDoAPI.DTOs;
-using System.Text.Json;
-using ToDoAPI.Models;
-using TodoApi.Repositories;
 
 namespace TodoApi.Controllers
 {
@@ -39,14 +28,6 @@ namespace TodoApi.Controllers
             return allToDos;
         }
 
-        // [Authorize]
-        // [HttpGet]
-        // public async Task<IEnumerable<ToDoDTO>> GetAllToDosForUserAsync(Guid userId)
-        // {
-        //     var allToDos = (await repository.GetAll()).Select(todo => todo.ToDoAsDTO());
-        //     return allToDos;
-        // }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDoDTO>> GetToDoAsync(Guid id)
         {
@@ -61,24 +42,24 @@ namespace TodoApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ToDoDTO>> CreateToDOAsync(CreateToDoDTO toDo)
+        public async Task<ActionResult<ToDoDTO>> CreateToDoAsync(CreateToDoDTO createToDoDTO)
         {
-            ToDo newToDO = new()
+            ToDo newToDo = new()
             {
                 Id = Guid.NewGuid(),
-                Description = toDo.Description,
-                Date = toDo.Date,
-                Time = toDo.Time,
-                Location = toDo.Location,
+                Description = createToDoDTO.Description,
+                Date = createToDoDTO.Date,
+                Time = createToDoDTO.Time,
+                Location = createToDoDTO.Location,
                 Done = false,
-                Priority = toDo.Priority,
-                FkTagId = toDo.FkTagId,
-                FkUserId = toDo.FkUserId //how to get userId
+                Priority = createToDoDTO.Priority,
+                FkTagId = createToDoDTO.FkTagId,
+                FkUserId = createToDoDTO.FkUserId
             };
 
-            var myCreatedEntity = await repository.Add(newToDO);
+            var myCreatedEntity = await repository.Add(newToDo);
 
-            return CreatedAtAction(nameof(GetToDoAsync), new { id = newToDO.Id }, newToDO.ToDoAsDTO());
+            return CreatedAtAction(nameof(GetToDoAsync), new { id = newToDo.Id }, newToDo.ToDoAsDTO());
 
         }
 
@@ -101,7 +82,6 @@ namespace TodoApi.Controllers
                 Location = toDoDTO.Location,
                 Done = toDoDTO.Done,
                 Priority = toDoDTO.Priority,
-                FkTagId = toDoDTO.FkTagId,
                 FkUserId = existingToDo.FkUserId
             };
 

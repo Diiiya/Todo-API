@@ -7,9 +7,9 @@ namespace TodoApi.Models
     {
         public Guid Id { get; init; }
         public string TagName { get; init; }
-        public string TagColor { get; init; } // should be enum?
+        public string TagColor { get; init; }
 
-
-        public List<ToDo> ToDoItems { get; init; }
+        // in order to use foreign keys and relations
+        public List<ToDo> ToDos {get; init;}
     }
 }

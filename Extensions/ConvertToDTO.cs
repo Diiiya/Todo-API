@@ -1,4 +1,3 @@
-using System;
 using TodoApi.DTOs;
 using TodoApi.Models;
 
@@ -24,8 +23,9 @@ namespace TodoApi
                 Id = todo.Id,
                 Description = todo.Description,
                 Date = todo.Date,
-                Done = todo.Done
-                //rest?
+                Time = todo.Time,
+                Location = todo.Location,
+                Priority = todo.Priority,
             };
         }
 
@@ -35,7 +35,7 @@ namespace TodoApi
             {
                 Id = tag.Id,
                 TagName = tag.TagName,
-                //rest?
+                TagColor = tag.TagColor
             };
         }
     }

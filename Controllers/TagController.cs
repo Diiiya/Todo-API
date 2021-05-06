@@ -6,17 +6,7 @@ using TodoApi.DTOs;
 using TodoApi.Models;
 using System.Threading.Tasks;
 using TodoApi.Data.EfCore;
-using Microsoft.AspNetCore.Authorization;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.Configuration;
-using ToDoAPI.Extensions;
 using ToDoAPI.DTOs;
-using System.Text.Json;
-using ToDoAPI.Models;
-using TodoApi.Repositories;
 
 namespace TodoApi.Controllers
 {
@@ -53,7 +43,7 @@ namespace TodoApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TagDTO>> CreateTagAsync(CreateAndUpdateTagDTO tag)
+        public async Task<ActionResult<TagDTO>> CreateTagAsync(CreateTagDTO tag)
         {
             Tag newTag = new()
             {
@@ -69,7 +59,7 @@ namespace TodoApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateTagAsync(Guid id, CreateAndUpdateTagDTO tag)
+        public async Task<ActionResult> UpdateTagAsync(Guid id, UpdateTagDTO tag)
         {
             Tag existingTag = await repository.Get(id);
 

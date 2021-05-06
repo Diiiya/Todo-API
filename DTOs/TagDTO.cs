@@ -6,6 +6,7 @@ namespace TodoApi.DTOs
     {
         public Guid Id { get; init; }
         public string TagName { get; init; }
-        public string TagColor { get; init; } // should be enum?
+        public string TagColor { get; init; } 
+
     }
 }

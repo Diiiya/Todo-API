@@ -21,6 +21,22 @@ namespace TodoApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "User",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_User", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ToDo",
                 columns: table => new
                 {
@@ -37,23 +53,29 @@ namespace TodoApi.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ToDo", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ToDo_Tag_FkTagId",
+                        column: x => x.FkTagId,
+                        principalTable: "Tag",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ToDo_User_FkUserId",
+                        column: x => x.FkUserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CreatedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_ToDo_FkTagId",
+                table: "ToDo",
+                column: "FkTagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ToDo_FkUserId",
+                table: "ToDo",
+                column: "FkUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Email",
@@ -71,10 +93,10 @@ namespace TodoApi.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Tag");
+                name: "ToDo");
 
             migrationBuilder.DropTable(
-                name: "ToDo");
+                name: "Tag");
 
             migrationBuilder.DropTable(
                 name: "User");

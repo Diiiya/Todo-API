@@ -6,21 +6,20 @@ namespace TodoApi.DTOs
     public record CreateToDoDTO
     {
         [Required]
-        [StringLength(255, MinimumLength = 2)]
+        [StringLength(255)]
         public string Description { get; init; }
         public DateTimeOffset Date { get; init; }
-        public DateTimeOffset Time { get; init; } // is it necessary?
+        public DateTimeOffset Time { get; init; }
 
-        [StringLength(255, MinimumLength = 3)]
+        [StringLength(255)]
         public string Location { get; init; }
-        // public bool Done { get; init; }
+        
+        [Range(1, 3)]
+        public int Priority { get; init; }
         [Required]
-        [StringLength(30, MinimumLength = 3)]
-        public int Priority { get; init; } //should i do it with enum?
-        // needs to be required
         public Guid FkTagId { get; init; }
 
-        // needs to be required
+        [Required]
         public Guid FkUserId { get; init; }
     }
 }

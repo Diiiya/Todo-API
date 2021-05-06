@@ -75,6 +75,10 @@ namespace TodoApi.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FkTagId");
+
+                    b.HasIndex("FkUserId");
+
                     b.ToTable("ToDo");
                 });
 
@@ -113,6 +117,35 @@ namespace TodoApi.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.ToDo", b =>
+                {
+                    b.HasOne("TodoApi.Models.Tag", "Tag")
+                        .WithMany("ToDos")
+                        .HasForeignKey("FkTagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TodoApi.Models.User", "User")
+                        .WithMany("ToDos")
+                        .HasForeignKey("FkUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.Tag", b =>
+                {
+                    b.Navigation("ToDos");
+                });
+
+            modelBuilder.Entity("TodoApi.Models.User", b =>
+                {
+                    b.Navigation("ToDos");
                 });
 #pragma warning restore 612, 618
         }

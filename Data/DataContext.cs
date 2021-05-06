@@ -29,8 +29,14 @@ namespace TodoApi.Data
             builder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+            
+            // to set primary key
+            builder.Entity<User>()
+            .HasKey(p => p.Id);
 
             builder.Entity<User>().ToTable("User");
+
+            
 
             builder.Entity<ToDo>()
             .Property(p => p.Id)
@@ -38,14 +44,12 @@ namespace TodoApi.Data
             builder.Entity<ToDo>()
             .Property(p => p.Description).HasMaxLength(255)
             .IsRequired();
-
             builder.Entity<ToDo>()
             .Property(p => p.Date);
             builder.Entity<ToDo>()
             .Property(p => p.Time);
             builder.Entity<ToDo>()
             .Property(p => p.Location).HasMaxLength(255);
-
             builder.Entity<ToDo>()
             .Property(p => p.Done)
             .IsRequired();
@@ -59,11 +63,20 @@ namespace TodoApi.Data
             .Property(p => p.FkUserId)
             .IsRequired();
 
-            // builder.Entity<ToDo>()
-            // .HasOne(p => p.TagItem)
-            // .HasMany(t => t.ToDoItems)
-            // .HasForeignKey(p => p.FkTagId)
-            // .HasPrincipalKey(t => t.Id);   
+            // to set primary key
+            builder.Entity<ToDo>()
+            .HasKey(p => p.Id);
+
+            // to set foreign keys
+            builder.Entity<ToDo>()
+            .HasOne(p => p.Tag)
+            .WithMany(t => t.ToDos)
+            .HasForeignKey(p => p.FkTagId);
+            builder.Entity<ToDo>()
+            .HasOne(p => p.User)
+            .WithMany(u => u.ToDos)
+            .HasForeignKey(p => p.FkUserId);
+            
             
             builder.Entity<ToDo>().ToTable("ToDo");
             
@@ -76,6 +89,10 @@ namespace TodoApi.Data
             builder.Entity<Tag>()
             .Property(p => p.TagColor).HasMaxLength(10)
             .IsRequired();
+
+            // to set primary key
+            builder.Entity<Tag>()
+            .HasKey(p => p.Id);
             
             builder.Entity<Tag>().ToTable("Tag");
         }
