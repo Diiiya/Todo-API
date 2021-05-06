@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ CIBranch ]
+    branches: [ staging ]
 #   pull_request:
 #     branches: [ staging ]
 
