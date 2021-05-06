@@ -1,4 +1,5 @@
 # Todo-API
+[![.NET](https://github.com/Diiiya/Todo-API/actions/workflows/ci.yml/badge.svg)](https://github.com/Diiiya/Todo-API/actions/workflows/ci.yml)
 
 ## Summary:
 ### Project > 
