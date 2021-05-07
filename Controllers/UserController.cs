@@ -100,11 +100,22 @@ namespace TodoApi.Controllers
                 return NotFound();
             }
 
+            var emailValue = "";
+            if (userDTO.Email != null)
+            {
+                emailValue = userDTO.Email;
+            }
+            else
+            {
+                emailValue = existingUser.Email;
+            }
+
+
             User updatedUser = existingUser with
             {
                 Id = existingUser.Id,
                 Username = existingUser.Username,
-                Email = userDTO.Email,
+                Email = emailValue,
                 Password = passwordHasher.hashPass(userDTO.Password),
                 CreatedDate = existingUser.CreatedDate,
                 Deleted = existingUser.Deleted

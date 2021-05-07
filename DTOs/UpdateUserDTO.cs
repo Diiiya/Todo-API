@@ -4,7 +4,6 @@ namespace TodoApi.DTOs
 {
     public record UpdateUserDTO
     {
-        [Required]
         [EmailAddress]
         [DataType(DataType.EmailAddress)]
         public string Email { get; init; }
