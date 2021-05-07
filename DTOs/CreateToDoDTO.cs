@@ -14,7 +14,7 @@ namespace TodoApi.DTOs
         [StringLength(255)]
         public string Location { get; init; }
         
-        [Range(1, 3)]
+        [Range(0, 3)]
         public int Priority { get; init; }
         [Required]
         public Guid FkTagId { get; init; }
