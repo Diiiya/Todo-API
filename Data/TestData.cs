@@ -23,8 +23,12 @@ namespace TodoApi.Data
                     return;
 
                 var users = TestData.GetAllUsers().ToArray();
+                var tags = TestData.GetAllTags().ToArray();
+                var todos = TestData.GetAllToDos().ToArray();
                 context.User.AddRange(users);
-                context.SaveChanges();
+                context.Tag.AddRange(tags);
+                context.ToDo.AddRange(todos);
+                context.SaveChanges(); 
             }
         }
 
@@ -34,7 +38,7 @@ namespace TodoApi.Data
             {
                 new User
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f311"),
                     Username = "User1",
                     Email = "user1@mail.com",
                     Password = passwordHasher.hashPass("Cvb123"),
@@ -43,7 +47,7 @@ namespace TodoApi.Data
                 },
                 new User
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f322"),
                     Username = "User2",
                     Email = "user2@mail.com",
                     Password = passwordHasher.hashPass("op[098"),
@@ -52,6 +56,46 @@ namespace TodoApi.Data
                 }
             };
             return userList;
+        }
+
+        public static List<ToDo> GetAllToDos()
+        {
+            List<ToDo> todoList = new()
+            {
+                new ToDo
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Do laundry",
+                    Date = DateTimeOffset.UtcNow.Date,
+                    Time = DateTimeOffset.UtcNow,
+                    Location = "Copenhagen",
+                    Done = false,
+                    Priority = 2,
+                    FkTagId = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f332"),
+                    FkUserId = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f311")
+                },
+            };
+            return todoList;
+        }
+
+        public static List<Tag> GetAllTags()
+        {
+            List<Tag> tagList = new()
+            {
+                new Tag
+                {
+                    Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f332"),
+                    TagName = "Room",
+                    TagColor = "Yellow"
+                },
+                new Tag
+                {
+                    Id = Guid.NewGuid(),
+                    TagName = "Household",
+                    TagColor = "Red"
+                }
+            };
+            return tagList;
         }
     }
 }
