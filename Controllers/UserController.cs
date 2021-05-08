@@ -100,29 +100,32 @@ namespace TodoApi.Controllers
                 return NotFound();
             }
 
-            var emailValue = "";
-            if (userDTO.Email != null)
+            if (passwordHasher.VerifyPassword(existingUser.Password, userDTO.CurrentPassword) == false) 
             {
-                emailValue = userDTO.Email;
-            }
-            else
-            {
-                emailValue = existingUser.Email;
+                return Unauthorized();
             }
 
+            var passwordValue = "";
+            if (userDTO.NewPassword != null) 
+            {
+                passwordValue = passwordHasher.hashPass(userDTO.NewPassword);
+            }
+            else 
+            {
+                passwordValue = existingUser.Password;
+            }
 
             User updatedUser = existingUser with
             {
                 Id = existingUser.Id,
                 Username = existingUser.Username,
-                Email = emailValue,
-                Password = passwordHasher.hashPass(userDTO.Password),
+                Email = userDTO.Email,
+                Password = passwordValue,
                 CreatedDate = existingUser.CreatedDate,
                 Deleted = existingUser.Deleted
             };
 
             await repository.Update(updatedUser);
-
             return NoContent();
         }
 
