@@ -9,6 +9,7 @@ namespace TodoApi.DTOs
         public DateTimeOffset Date { get; init; }
         public DateTimeOffset Time { get; init; } 
         public string Location { get; init; }
+        public bool Done { get; init; }
         public int Priority { get; init; } 
         public Guid FkTagId { get; init; }
         public Guid FkUserId { get; init; }

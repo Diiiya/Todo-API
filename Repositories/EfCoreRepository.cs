@@ -48,6 +48,12 @@ namespace TodoApi
             return await context.Set<TEntity>().ToListAsync();
         }
 
+        public async Task<List<ToDo>> GetAllTodosByUser(Guid userId)
+        {
+            var allTasks = await context.Set<ToDo>().Where(todoo => todoo.FkUserId == userId).ToListAsync();
+            return allTasks;
+        }
+
         public async Task<TEntity> Update(TEntity entity)
         {
             context.Entry(entity).State = EntityState.Modified;
