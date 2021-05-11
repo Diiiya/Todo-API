@@ -28,6 +28,13 @@ namespace TodoApi.Controllers
             return allToDos;
         }
 
+        [HttpGet("user/{userId}")]
+        public async Task<IEnumerable<ToDoDTO>> GetAllToDosByUserAsync(Guid userId)
+        {
+            var allToDos = (await repository.GetAllTodosByUser(userId)).Select(todo => todo.ToDoAsDTO());
+            return allToDos;
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDoDTO>> GetToDoAsync(Guid id)
         {
