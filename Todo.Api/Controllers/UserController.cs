@@ -17,6 +17,7 @@ using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase
@@ -42,7 +43,6 @@ namespace Todo.Api.Controllers
             this._configuration = configuration;
         }
 
-        // [Authorize]
         [HttpGet]
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
@@ -50,7 +50,6 @@ namespace Todo.Api.Controllers
             return allUsers;
         }
 
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserAsync(Guid id)
         {
@@ -64,6 +63,7 @@ namespace Todo.Api.Controllers
             return user.AsDTO();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<UserDTO>> CreateUserAsync(CreateUserDTO userDTO)
         {
@@ -82,7 +82,6 @@ namespace Todo.Api.Controllers
             return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
 
-        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
@@ -122,7 +121,6 @@ namespace Todo.Api.Controllers
             return NoContent();
         }
 
-        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
@@ -138,7 +136,6 @@ namespace Todo.Api.Controllers
             return NoContent();
         }
 
-        [Authorize]
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)

@@ -58,7 +58,7 @@ namespace Todo.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateTagAsync(Guid id, UpdateTagDTO tag)
+        public async Task<ActionResult> UpdateTagAsync(Guid id, CreateTagDTO tag)
         {
             Tag existingTag = await tagRepo.Get(id);
 
