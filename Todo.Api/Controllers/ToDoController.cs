@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Todo.Api.DTOs;
 using Todo.Api.Models;
 using System.Threading.Tasks;
-using Todo.Api.Data.EfCore;
+using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
@@ -14,31 +14,24 @@ namespace Todo.Api.Controllers
     [Route("todos")]
     public class ToDoController : ControllerBase
     {
-        private readonly EfCoreToDoRepository repository;
+        private readonly IToDoRepo todoRepo;
 
-        public ToDoController(EfCoreToDoRepository repository)
+        public ToDoController(IToDoRepo todoRepo)
         {
-            this.repository = repository;
+            this.todoRepo = todoRepo;
         }
 
         [HttpGet]
         public async Task<IEnumerable<ToDoDTO>> GetAllToDosAsync()
         {
-            var allToDos = (await repository.GetAll()).Select(todo => todo.ToDoAsDTO());
-            return allToDos;
-        }
-
-        [HttpGet("user/{userId}")]
-        public async Task<IEnumerable<ToDoDTO>> GetAllToDosByUserAsync(Guid userId)
-        {
-            var allToDos = (await repository.GetAllTodosByUser(userId)).Select(todo => todo.ToDoAsDTO());
+            var allToDos = (await todoRepo.GetAll()).Select(todo => todo.ToDoAsDTO());
             return allToDos;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ToDoDTO>> GetToDoAsync(Guid id)
         {
-            var todo = await repository.Get(id);
+            var todo = await todoRepo.Get(id);
 
             if (todo is null)
             {
@@ -46,6 +39,13 @@ namespace Todo.Api.Controllers
             }
 
             return Ok(todo.ToDoAsDTO());
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IEnumerable<ToDoDTO>> GetAllToDosByUserAsync(Guid userId)
+        {
+            var allToDos = (await todoRepo.GetAllTodosByUser(userId)).Select(todo => todo.ToDoAsDTO());
+            return allToDos;
         }
 
         [HttpPost]
@@ -64,7 +64,7 @@ namespace Todo.Api.Controllers
                 FkUserId = createToDoDTO.FkUserId
             };
 
-            var myCreatedEntity = await repository.Add(newToDo);
+            var myCreatedEntity = await todoRepo.Add(newToDo);
 
             return CreatedAtAction(nameof(GetToDoAsync), new { id = newToDo.Id }, newToDo.ToDoAsDTO());
 
@@ -73,7 +73,7 @@ namespace Todo.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateToDOAsync(Guid id, UpdateToDoDTO toDoDTO)
         {
-            ToDo existingToDo = await repository.Get(id);
+            ToDo existingToDo = await todoRepo.Get(id);
 
             if (existingToDo is null)
             {
@@ -92,7 +92,7 @@ namespace Todo.Api.Controllers
                 FkUserId = existingToDo.FkUserId
             };
 
-            await repository.Update(updatedToDO);
+            await todoRepo.Update(updatedToDO);
 
             return NoContent();
         }
@@ -100,14 +100,14 @@ namespace Todo.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteToDoAsync(Guid id)
         {
-            ToDo existingToDo = await repository.Get(id);
+            ToDo existingToDo = await todoRepo.Get(id);
 
             if (existingToDo is null)
             {
                 return NotFound();
             }
 
-            await repository.Delete(id);
+            await todoRepo.Delete(id);
 
             return NoContent();
         }

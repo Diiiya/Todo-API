@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Todo.Api.DTOs;
 using Todo.Api.Models;
 using System.Threading.Tasks;
-using Todo.Api.Data.EfCore;
-using Todo.Api.DTOs;
+using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
@@ -15,24 +14,24 @@ namespace Todo.Api.Controllers
     [Route("tags")]
     public class TagController : ControllerBase
     {
-        private readonly EfCoreTagRepository repository;
+        private readonly ITagRepo tagRepo;
 
-        public TagController(EfCoreTagRepository repository)
+        public TagController(ITagRepo tagRepo)
         {
-            this.repository = repository;
+            this.tagRepo = tagRepo;
         }
 
         [HttpGet]
         public async Task<IEnumerable<TagDTO>> GetAllTagsAsync()
         {
-            var allTags = (await repository.GetAll()).Select(tag => tag.TagAsDTO());
+            var allTags = (await tagRepo.GetAll()).Select(tag => tag.TagAsDTO());
             return allTags;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TagDTO>> GetTagAsync(Guid id)
         {
-            var tag = await repository.Get(id);
+            var tag = await tagRepo.Get(id);
 
             if (tag is null)
             {
@@ -52,7 +51,7 @@ namespace Todo.Api.Controllers
                 TagColor = tag.TagColor
             };
 
-            var myCreatedEntity = await repository.Add(newTag);
+            var myCreatedEntity = await tagRepo.Add(newTag);
 
             return CreatedAtAction(nameof(GetTagAsync), new { id = newTag.Id }, newTag.TagAsDTO());
 
@@ -61,7 +60,7 @@ namespace Todo.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateTagAsync(Guid id, UpdateTagDTO tag)
         {
-            Tag existingTag = await repository.Get(id);
+            Tag existingTag = await tagRepo.Get(id);
 
             if (existingTag is null)
             {
@@ -75,7 +74,7 @@ namespace Todo.Api.Controllers
                 TagColor = tag.TagColor
             };
 
-            await repository.Update(updatedTag);
+            await tagRepo.Update(updatedTag);
 
             return NoContent();
         }
@@ -83,14 +82,14 @@ namespace Todo.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTagAsync(Guid id)
         {
-            Tag existingTag = await repository.Get(id);
+            Tag existingTag = await tagRepo.Get(id);
 
             if (existingTag is null)
             {
                 return NotFound();
             }
 
-            await repository.Delete(id);
+            await tagRepo.Delete(id);
 
             return NoContent();
         }

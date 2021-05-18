@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Todo.Api.Repositories
+namespace Todo.Api.Interfaces
 {
     public interface IRepository<T> where T : class
     {

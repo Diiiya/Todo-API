@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Todo.Api.DTOs;
 using Todo.Api.Models;
 using System.Threading.Tasks;
-using Todo.Api.Data.EfCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
@@ -13,9 +12,8 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using Todo.Api.Extensions;
-using Todo.Api.DTOs;
 using System.Text.Json;
-using Todo.Api.Models;
+using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
@@ -32,22 +30,23 @@ namespace Todo.Api.Controllers
         // }
 
         // MSSQL DB
-        private readonly EfCoreUserRepository repository;
+        // private readonly EfCoreUserRepository repository;
+        private readonly IUserRepo userRepo;
         PasswordHasher passwordHasher = new PasswordHasher();
 
         public IConfiguration _configuration;
 
-        public UserController(EfCoreUserRepository repository, IConfiguration configuration)
+        public UserController(IUserRepo userRepo, IConfiguration configuration)
         {
-            this.repository = repository;
+            this.userRepo = userRepo;
             this._configuration = configuration;
         }
 
-        [Authorize]
+        // [Authorize]
         [HttpGet]
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
-            var allUsers = (await repository.GetAll()).Select(user => user.AsDTO());
+            var allUsers = (await userRepo.GetAll()).Select(user => user.AsDTO());
             return allUsers;
         }
 
@@ -55,14 +54,14 @@ namespace Todo.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserAsync(Guid id)
         {
-            var user = await repository.Get(id);
+            var user = await userRepo.Get(id);
 
             if (user is null)
             {
                 return NotFound();
             }
 
-            return Ok(user.AsDTO());
+            return user.AsDTO();
         }
 
         [HttpPost]
@@ -78,22 +77,16 @@ namespace Todo.Api.Controllers
                 Deleted = false
             };
 
-            var myCreatedEntity = await repository.Add(newUser);
+            var myCreatedEntity = await userRepo.Add(newUser);
 
-            Token myObjT = CreateToken(newUser.Id);
-            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-            var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
-            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
-
-            return Ok(deserialized);//CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
-
+            return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
 
         [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
-            User existingUser = await repository.Get(id);
+            User existingUser = await userRepo.Get(id);
 
             if (existingUser is null)
             {
@@ -125,7 +118,7 @@ namespace Todo.Api.Controllers
                 Deleted = existingUser.Deleted
             };
 
-            await repository.Update(updatedUser);
+            await userRepo.Update(updatedUser);
             return NoContent();
         }
 
@@ -133,14 +126,14 @@ namespace Todo.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
-            User existingUser = await repository.Get(id);
+            User existingUser = await userRepo.Get(id);
 
             if (existingUser is null)
             {
                 return NotFound();
             }
 
-            await repository.Delete(id);
+            await userRepo.Delete(id);
 
             return NoContent();
         }
@@ -150,7 +143,7 @@ namespace Todo.Api.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)
         {
-            IEnumerable<UserDTO> users = (await repository.GetAll()).Select(user => user.AsDTO());
+            IEnumerable<UserDTO> users = (await userRepo.GetAll()).Select(user => user.AsDTO());
 
             var authenticatedUser = users.FirstOrDefault(u =>
                 (u.Username == userCredentials.Login || u.Email == userCredentials.Login) &&

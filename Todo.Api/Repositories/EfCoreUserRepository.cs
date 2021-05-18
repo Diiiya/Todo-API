@@ -1,23 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Todo.Api.Models;
-using Todo.Api.Repositories;
+using Todo.Api.Interfaces;
 
 namespace Todo.Api.Data.EfCore
 {
-    public class EfCoreUserRepository : IRepository<User>
+    public class EfCoreUserRepository : IUserRepo
     {
         private readonly DataContext context;
         public EfCoreUserRepository(DataContext context)
         {
             this.context = context;
         }
+        public async Task<List<User>> GetAll()
+        {
+            return await context.Set<User>().ToListAsync();
+        }
+
+        public async Task<User> Get(Guid id)
+        {
+            return await context.Set<User>().FindAsync(id);
+        }
         public async Task<User> Add(User entity)
         {
             context.Set<User>().Add(entity);
+            await context.SaveChangesAsync();
+            return entity;
+        }
+
+        public async Task<User> Update(User entity)
+        {
+            context.Entry(entity).State = EntityState.Modified;
             await context.SaveChangesAsync();
             return entity;
         }
@@ -33,23 +48,6 @@ namespace Todo.Api.Data.EfCore
             context.Set<User>().Remove(entity);
             await context.SaveChangesAsync();
 
-            return entity;
-        }
-
-        public async Task<User> Get(Guid id)
-        {
-            return await context.Set<User>().FindAsync(id);
-        }
-
-        public async Task<List<User>> GetAll()
-        {
-            return await context.Set<User>().ToListAsync();
-        }
-
-        public async Task<User> Update(User entity)
-        {
-            context.Entry(entity).State = EntityState.Modified;
-            await context.SaveChangesAsync();
             return entity;
         }
 

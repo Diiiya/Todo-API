@@ -13,6 +13,6 @@ namespace Todo.Api.Models
         public bool Deleted { get; init; }
         
         // in order to use foreign keys and relations
-        public List<ToDo> ToDos {get; init;}
+        public List<ToDo> ToDos {get; init;} = new();
     }
 }

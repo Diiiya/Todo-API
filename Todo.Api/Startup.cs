@@ -11,6 +11,7 @@ using Todo.Api.Data.EfCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Todo.Api.Interfaces;
 
 namespace Todo.Api
 {
@@ -33,9 +34,9 @@ namespace Todo.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             );
 
-            services.AddScoped<EfCoreUserRepository>();
-            services.AddScoped<EfCoreToDoRepository>();
-            services.AddScoped<EfCoreTagRepository>();
+            services.AddScoped<IUserRepo, EfCoreUserRepository>();
+            services.AddScoped<IToDoRepo, EfCoreToDoRepository>();
+            services.AddScoped<ITagRepo, EfCoreTagRepository>();
 
             services.AddControllers(options =>
             {
