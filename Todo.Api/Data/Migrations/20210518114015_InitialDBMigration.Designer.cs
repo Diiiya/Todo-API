@@ -10,8 +10,8 @@ using Todo.Api.Data;
 namespace Todo.Api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210506181409_UserMigrations")]
-    partial class UserMigrations
+    [Migration("20210518114015_InitialDBMigration")]
+    partial class InitialDBMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -48,7 +48,7 @@ namespace Todo.Api.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("Date")
+                    b.Property<DateTimeOffset>("DateTime")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
@@ -71,9 +71,6 @@ namespace Todo.Api.Data.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 

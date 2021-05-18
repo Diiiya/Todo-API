@@ -55,8 +55,7 @@ namespace Todo.Api.Controllers
             {
                 Id = Guid.NewGuid(),
                 Description = createToDoDTO.Description,
-                Date = createToDoDTO.Date,
-                Time = createToDoDTO.Time,
+                DateTime = createToDoDTO.DateTime,
                 Location = createToDoDTO.Location,
                 Done = false,
                 Priority = createToDoDTO.Priority,
@@ -84,8 +83,7 @@ namespace Todo.Api.Controllers
             {
                 Id = existingToDo.Id,
                 Description = toDoDTO.Description,
-                Date = toDoDTO.Date,
-                Time = toDoDTO.Time,
+                DateTime = toDoDTO.DateTime,
                 Location = toDoDTO.Location,
                 Done = toDoDTO.Done,
                 Priority = toDoDTO.Priority,

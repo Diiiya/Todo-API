@@ -25,8 +25,7 @@ namespace Todo.Api.Data
             // ToDo table
             builder.Entity<ToDo>().Property(p => p.Id).IsRequired();
             builder.Entity<ToDo>().Property(p => p.Description).HasMaxLength(255).IsRequired();
-            builder.Entity<ToDo>().Property(p => p.Date);
-            builder.Entity<ToDo>().Property(p => p.Time);
+            builder.Entity<ToDo>().Property(p => p.DateTime);
             builder.Entity<ToDo>().Property(p => p.Location).HasMaxLength(255);
             builder.Entity<ToDo>().Property(p => p.Done).IsRequired();
             builder.Entity<ToDo>().Property(p => p.Priority);

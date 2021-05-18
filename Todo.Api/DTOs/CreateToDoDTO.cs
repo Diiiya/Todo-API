@@ -8,8 +8,7 @@ namespace Todo.Api.DTOs
         [Required]
         [StringLength(255)]
         public string Description { get; init; }
-        public DateTimeOffset Date { get; init; }
-        public DateTimeOffset Time { get; init; }
+        public DateTimeOffset DateTime { get; init; }
 
         [StringLength(255)]
         public string Location { get; init; }

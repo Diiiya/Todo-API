@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Todo.Api.Data.Migrations
 {
-    public partial class UserMigrations : Migration
+    public partial class InitialDBMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -42,8 +42,7 @@ namespace Todo.Api.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Date = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Done = table.Column<bool>(type: "bit", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),

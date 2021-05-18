@@ -66,8 +66,7 @@ namespace Todo.Api.Data
                 {
                     Id = Guid.NewGuid(),
                     Description = "Do laundry",
-                    Date = DateTimeOffset.UtcNow.Date,
-                    Time = DateTimeOffset.UtcNow,
+                    DateTime = DateTimeOffset.UtcNow,
                     Location = "Copenhagen",
                     Done = false,
                     Priority = 2,

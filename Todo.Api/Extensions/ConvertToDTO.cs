@@ -22,8 +22,7 @@ namespace Todo.Api
             {
                 Id = todo.Id,
                 Description = todo.Description,
-                Date = todo.Date,
-                Time = todo.Time,
+                DateTime = todo.DateTime,
                 Location = todo.Location,
                 Priority = todo.Priority,
             };
