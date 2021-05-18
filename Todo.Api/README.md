@@ -36,7 +36,7 @@ where username is sa and password is R@nd0!mmm (as in the Connection String)
 
 If Docker container is running: 
 ``` 
-dotnet-ef migrations add UserMigrations -o Data/Migrations
+dotnet-ef migrations add InitialDBMigration -o Todo.Api/Data/Migrations
 
 dotnet-ef database update 
 ``` 
