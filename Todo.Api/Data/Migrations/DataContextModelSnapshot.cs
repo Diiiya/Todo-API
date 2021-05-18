@@ -46,7 +46,7 @@ namespace Todo.Api.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("Date")
+                    b.Property<DateTimeOffset>("DateTime")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
@@ -69,9 +69,6 @@ namespace Todo.Api.Data.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("Time")
-                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 

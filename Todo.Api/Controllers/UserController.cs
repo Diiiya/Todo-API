@@ -138,7 +138,7 @@ namespace Todo.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public async Task<ActionResult> Authenticate([FromBody] LoginUserDTO userCredentials)
+        public async Task<ActionResult> AuthenticateUserAsync(LoginUserDTO userCredentials)
         {
             IEnumerable<UserDTO> users = (await userRepo.GetAll()).Select(user => user.AsDTO());
 

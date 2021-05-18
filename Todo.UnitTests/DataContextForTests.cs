@@ -23,9 +23,11 @@ namespace Todo.UnitTests
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
+                Guid myGuid = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+
                 var user1 = new User
                     {
-                        Id = Guid.NewGuid(),
+                        Id = myGuid,
                         Username = "Username1",
                         Email = "email2@mail.com",
                         Password = "lala123",
