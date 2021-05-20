@@ -7,7 +7,7 @@ namespace Todo.Api.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        // Fluent API used to define the data rules (instead of data annotation used only for the DTOs but not the models)
+        // Fluent API used to define the database properties and configurations
         protected override void OnModelCreating(ModelBuilder builder)
         {
             // User table

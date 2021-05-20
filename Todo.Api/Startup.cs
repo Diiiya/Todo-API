@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Todo.Api.Interfaces;
+using FluentValidation.AspNetCore;
+using Todo.Api.Validators;
 
 namespace Todo.Api
 {
@@ -55,6 +57,14 @@ namespace Todo.Api
             });
 
             services.AddControllers();
+            services
+                .AddControllers()
+                .AddFluentValidation(fv => 
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining<CreateUserValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<UpdateUserValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<LoginUserValidator>();
+                });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Todo.Api", Version = "v1" });
