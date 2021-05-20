@@ -34,9 +34,9 @@ docker run --name todo-mssql-db -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=R@nd0!mmm" -e
 ```
 where username is sa and password is R@nd0!mmm (as in the Connection String)
 
-If Docker container is running: 
+If Docker container is running (inside the Todo.Api project): 
 ``` 
-dotnet-ef migrations add InitialDBMigration -o Todo.Api/Data/Migrations
+dotnet-ef migrations add InitialDBMigration -o Data/Migrations
 
 dotnet-ef database update 
 ``` 
