@@ -10,8 +10,9 @@ using Todo.Api.Extensions;
 using Todo.Api.Models;
 using Todo.Api.Interfaces;
 using Xunit;
+using Todo.Api.Validators;
 
-namespace Todo.UnitTests
+namespace Todo.UnitTests.ControllersTests
 {
     public class UserControllerTests 
     {
@@ -108,7 +109,6 @@ namespace Todo.UnitTests
             Assert.Equal(userToCreate.Email, createdUser.Email);
             result.Result.Should().BeOfType<CreatedAtActionResult>();
         }
-
 
         [Fact]
         public async Task UpdateUserAsync_WithExistingUser_ReturnsNoContent()
@@ -208,12 +208,12 @@ namespace Todo.UnitTests
         }
 
         // [Fact]
+        // Fails because IEnumerable and LINQ query in the method ?
         // public async Task AuthenticateUserAsync_WithCorrectUserCredentials_ReturnsOkObjectResult()
         // { 
         //     // Arrange
         //     var existingUser = CreateRandomUser();
         //     userRepoStub.Setup(repo => repo.Get(It.IsAny<Guid>())).ReturnsAsync(existingUser);
-        //     var userId = existingUser.Id;
 
         //     var userLogin = new LoginUserDTO()
         //     {
@@ -229,5 +229,8 @@ namespace Todo.UnitTests
         //     // Assert
         //     result.Should().BeOfType<OkObjectResult>();
         // }
+
+        
+
     }
 }
