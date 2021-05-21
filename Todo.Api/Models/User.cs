@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Todo.Api.Models
 {
@@ -15,5 +14,6 @@ namespace Todo.Api.Models
         
         // in order to use foreign keys and relations
         public List<ToDo> ToDos {get; init;} = new();
+        public List<Tag> Tags {get; init;} = new();
     }
 }

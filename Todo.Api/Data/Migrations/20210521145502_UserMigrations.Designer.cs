@@ -10,8 +10,8 @@ using Todo.Api.Data;
 namespace Todo.Api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210518114015_InitialDBMigration")]
-    partial class InitialDBMigration
+    [Migration("20210521145502_UserMigrations")]
+    partial class UserMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,6 +27,9 @@ namespace Todo.Api.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("FkUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("TagColor")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -38,6 +41,8 @@ namespace Todo.Api.Data.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FkUserId");
 
                     b.ToTable("Tag");
                 });
@@ -59,7 +64,7 @@ namespace Todo.Api.Data.Migrations
                     b.Property<bool>("Done")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("FkTagId")
+                    b.Property<Guid?>("FkTagId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("FkUserId")
@@ -118,13 +123,22 @@ namespace Todo.Api.Data.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("Todo.Api.Models.Tag", b =>
+                {
+                    b.HasOne("Todo.Api.Models.User", "User")
+                        .WithMany("Tags")
+                        .HasForeignKey("FkUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Todo.Api.Models.ToDo", b =>
                 {
                     b.HasOne("Todo.Api.Models.Tag", "Tag")
                         .WithMany("ToDos")
-                        .HasForeignKey("FkTagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FkTagId");
 
                     b.HasOne("Todo.Api.Models.User", "User")
                         .WithMany("ToDos")
@@ -144,6 +158,8 @@ namespace Todo.Api.Data.Migrations
 
             modelBuilder.Entity("Todo.Api.Models.User", b =>
                 {
+                    b.Navigation("Tags");
+
                     b.Navigation("ToDos");
                 });
 #pragma warning restore 612, 618

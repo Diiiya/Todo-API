@@ -7,6 +7,7 @@ namespace Todo.Api.DTOs
         public Guid Id { get; init; }
         public string TagName { get; init; }
         public string TagColor { get; init; } 
+        public Guid FkUserId { get; init; }
 
     }
 }

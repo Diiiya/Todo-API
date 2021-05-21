@@ -42,8 +42,10 @@ namespace Todo.Api.Data
             builder.Entity<Tag>().Property(p => p.Id).IsRequired();
             builder.Entity<Tag>().Property(p => p.TagName).HasMaxLength(20).IsRequired();
             builder.Entity<Tag>().Property(p => p.TagColor).HasMaxLength(10).IsRequired();
+            builder.Entity<Tag>().Property(p => p.FkUserId).IsRequired();
 
-            builder.Entity<Tag>().HasKey(p => p.Id);            
+            builder.Entity<Tag>().HasKey(p => p.Id);     
+            builder.Entity<Tag>().HasOne(p => p.User).WithMany(u => u.Tags).HasForeignKey(p => p.FkUserId);         
             builder.Entity<Tag>().ToTable("Tag");
         }
 

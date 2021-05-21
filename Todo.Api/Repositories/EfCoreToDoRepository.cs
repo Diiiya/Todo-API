@@ -26,12 +26,34 @@ namespace Todo.Api.Data.EfCore
         }
         public async Task<List<ToDo>> GetAllTodosByUser(Guid userId)
         {
-            var allTasks = await context.Set<ToDo>().Where(todoo => todoo.FkUserId == userId).ToListAsync();
+            /*
+             In cases where the data is read-only i.e. it is being used for display purposes on a web page and will not be modified during the current request, 
+             it is not necessary to have the context perform the extra work required to set up tracking. The AsNoTracking method stops this work being done and can improve performance of an application
+             a series of read-only queries to perform against the same instance of the context, you can configure the tracking behaviour at context-level instead of using the AsNoTracking method in each query
+            */
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            var allTasks = await context.Set<ToDo>().Where(todo => todo.FkUserId == userId).ToListAsync();
+            var allTags = await context.Set<Tag>().Where(tag => tag.FkUserId == userId).ToListAsync();
+            foreach (var item in allTasks)
+            {
+                Tag myTag = new();
+                if (item.FkTagId != null)
+                {
+                    myTag = allTags.Find(tag => tag.Id == item.FkTagId);
+                }
+                item.Tag = myTag;
+            }
             return allTasks;
         }
         public async Task<ToDo> Add(ToDo entity)
         {
             context.Set<ToDo>().Add(entity);
+            if (entity.FkTagId != null)
+            {
+                context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                Tag myTag = await context.Set<Tag>().FindAsync(entity.FkTagId);
+                entity.Tag = myTag;
+            }
             await context.SaveChangesAsync();
             return entity;
         }
