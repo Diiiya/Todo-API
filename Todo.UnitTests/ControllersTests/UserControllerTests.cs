@@ -65,13 +65,13 @@ namespace Todo.UnitTests.ControllersTests
 
         private User CreateRandomUser() 
         {
-            
+            byte[] salt = new byte[]{};
             return new() 
             {
                 Id = Guid.NewGuid(),
                 Username = Guid.NewGuid().ToString(),
                 Email = Guid.NewGuid().ToString() + "@mail.com",
-                Password = passwordHasher.hashPass("lala123"),
+                Password = passwordHasher.hashPass("lala123", salt),
                 CreatedDate = DateTimeOffset.UtcNow,
                 Deleted = false,
                 ToDos = null
