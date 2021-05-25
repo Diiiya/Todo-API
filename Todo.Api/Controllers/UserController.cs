@@ -67,13 +67,12 @@ namespace Todo.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<UserDTO>> CreateUserAsync(CreateUserDTO userDTO)
         {
-            byte[] salt = new byte[]{};
             User newUser = new()
             {
                 Id = Guid.NewGuid(),
                 Username = userDTO.Username,
                 Email = userDTO.Email,
-                Password = passwordHasher.hashPass(userDTO.Password, salt),
+                Password = passwordHasher.hashPass(userDTO.Password),
                 CreatedDate = DateTimeOffset.UtcNow,
                 Deleted = false
             };
@@ -86,7 +85,6 @@ namespace Todo.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
-            byte[] salt = new byte[]{};
             User existingUser = await userRepo.Get(id);
 
             if (existingUser is null)
@@ -102,7 +100,7 @@ namespace Todo.Api.Controllers
             var passwordValue = "";
             if (userDTO.NewPassword != null) 
             {
-                passwordValue = passwordHasher.hashPass(userDTO.NewPassword, salt);
+                passwordValue = passwordHasher.hashPass(userDTO.NewPassword);
             }
             else 
             {

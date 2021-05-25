@@ -34,7 +34,6 @@ namespace Todo.Api.Data
 
         public static List<User> GetAllUsers()
         {
-            byte[] salt = new byte[]{};
             List<User> userList = new()
             {
                 new User
@@ -42,7 +41,7 @@ namespace Todo.Api.Data
                     Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f311"),
                     Username = "User1",
                     Email = "user1@mail.com",
-                    Password = passwordHasher.hashPass("Cvb123", salt),
+                    Password = passwordHasher.hashPass("Cvb123"),
                     CreatedDate = DateTimeOffset.UtcNow,
                     Deleted = false
                 },
@@ -51,7 +50,7 @@ namespace Todo.Api.Data
                     Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f332"),
                     Username = "User2",
                     Email = "user2@mail.com",
-                    Password = passwordHasher.hashPass("op[098", salt),
+                    Password = passwordHasher.hashPass("op[098"),
                     CreatedDate = DateTimeOffset.UtcNow,
                     Deleted = false
                 }

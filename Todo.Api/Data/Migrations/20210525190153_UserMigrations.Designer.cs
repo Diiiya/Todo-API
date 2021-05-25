@@ -10,7 +10,7 @@ using Todo.Api.Data;
 namespace Todo.Api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20210524180749_UserMigrations")]
+    [Migration("20210525190153_UserMigrations")]
     partial class UserMigrations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
