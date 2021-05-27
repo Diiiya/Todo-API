@@ -48,7 +48,8 @@ namespace Todo.Api.Controllers
             {
                 Id = Guid.NewGuid(),
                 TagName = tag.TagName,
-                TagColor = tag.TagColor
+                TagColor = tag.TagColor,
+                FkUserId = tag.FkUserId
             };
 
             var myCreatedEntity = await tagRepo.Add(newTag);
@@ -71,7 +72,8 @@ namespace Todo.Api.Controllers
             {
                 Id = existingTag.Id,
                 TagName = tag.TagName,
-                TagColor = tag.TagColor
+                TagColor = tag.TagColor,
+                FkUserId = existingTag.FkUserId
             };
 
             await tagRepo.Update(updatedTag);

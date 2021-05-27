@@ -3,23 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Todo.Api.Data.Migrations
 {
-    public partial class InitialDBMigration : Migration
+    public partial class UserMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Tag",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TagName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TagColor = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tag", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "User",
                 columns: table => new
@@ -37,6 +24,26 @@ namespace Todo.Api.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tag",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TagName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TagColor = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    FkUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tag", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tag_User_FkUserId",
+                        column: x => x.FkUserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ToDo",
                 columns: table => new
                 {
@@ -46,7 +53,7 @@ namespace Todo.Api.Data.Migrations
                     Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Done = table.Column<bool>(type: "bit", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false),
-                    FkTagId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FkTagId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     FkUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -57,7 +64,7 @@ namespace Todo.Api.Data.Migrations
                         column: x => x.FkTagId,
                         principalTable: "Tag",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ToDo_User_FkUserId",
                         column: x => x.FkUserId,
@@ -65,6 +72,11 @@ namespace Todo.Api.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tag_FkUserId",
+                table: "Tag",
+                column: "FkUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ToDo_FkTagId",

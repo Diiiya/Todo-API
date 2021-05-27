@@ -44,29 +44,49 @@ namespace Todo.Api.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IEnumerable<ToDoDTO>> GetAllToDosByUserAsync(Guid userId)
         {
-            var allToDos = (await todoRepo.GetAllTodosByUser(userId)).Select(todo => todo.ToDoAsDTO());
+            var allToDos = (await todoRepo.GetAllTodosByUser(userId)).Select(todo =>
+            {
+                todo.Tag.TagAsDTO();
+                return todo.ToDoAsDTO();
+            });
             return allToDos;
         }
 
         [HttpPost]
         public async Task<ActionResult<ToDoDTO>> CreateToDoAsync(CreateToDoDTO createToDoDTO)
         {
-            ToDo newToDo = new()
+            ToDo newToDo;
+            if (createToDoDTO.FkTagId != Guid.Empty)
             {
-                Id = Guid.NewGuid(),
-                Description = createToDoDTO.Description,
-                DateTime = createToDoDTO.DateTime,
-                Location = createToDoDTO.Location,
-                Done = false,
-                Priority = createToDoDTO.Priority,
-                FkTagId = createToDoDTO.FkTagId,
-                FkUserId = createToDoDTO.FkUserId
-            };
-
+                newToDo = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Description = createToDoDTO.Description,
+                    DateTime = createToDoDTO.DateTime,
+                    Location = createToDoDTO.Location,
+                    Done = false,
+                    Priority = createToDoDTO.Priority,
+                    FkTagId = createToDoDTO.FkTagId,
+                    FkUserId = createToDoDTO.FkUserId
+                };
+            }
+            else
+            {
+                newToDo = new()
+                {
+                    Id = Guid.NewGuid(),
+                    Description = createToDoDTO.Description,
+                    DateTime = createToDoDTO.DateTime,
+                    Location = createToDoDTO.Location,
+                    Done = false,
+                    Priority = createToDoDTO.Priority,
+                    FkUserId = createToDoDTO.FkUserId
+                };
+            }
+            
             var myCreatedEntity = await todoRepo.Add(newToDo);
 
             return CreatedAtAction(nameof(GetToDoAsync), new { id = newToDo.Id }, newToDo.ToDoAsDTO());
-
         }
 
         [HttpPut("{id}")]

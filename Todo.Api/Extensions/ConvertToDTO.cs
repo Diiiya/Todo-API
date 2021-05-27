@@ -18,6 +18,10 @@ namespace Todo.Api
 
         public static ToDoDTO ToDoAsDTO(this ToDo todo)
         {
+            TagDTO myTag = new();
+            if(todo.Tag != null){
+                myTag = todo.Tag.TagAsDTO();
+            }
             return new ToDoDTO
             {
                 Id = todo.Id,
@@ -25,6 +29,9 @@ namespace Todo.Api
                 DateTime = todo.DateTime,
                 Location = todo.Location,
                 Priority = todo.Priority,
+                FkTagId = todo.FkTagId,
+                FkUserId = todo.FkUserId,
+                Tag = myTag
             };
         }
 
@@ -34,7 +41,8 @@ namespace Todo.Api
             {
                 Id = tag.Id,
                 TagName = tag.TagName,
-                TagColor = tag.TagColor
+                TagColor = tag.TagColor,
+                FkUserId = tag.FkUserId
             };
         }
     }

@@ -47,7 +47,7 @@ namespace Todo.Api.Data
                 },
                 new User
                 {
-                    Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f322"),
+                    Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f332"),
                     Username = "User2",
                     Email = "user2@mail.com",
                     Password = passwordHasher.hashPass("op[098"),
@@ -85,13 +85,15 @@ namespace Todo.Api.Data
                 {
                     Id = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f332"),
                     TagName = "Room",
-                    TagColor = "Yellow"
+                    TagColor = "Yellow",
+                    FkUserId = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f311")
                 },
                 new Tag
                 {
                     Id = Guid.NewGuid(),
                     TagName = "Household",
-                    TagColor = "Red"
+                    TagColor = "Red",
+                    FkUserId = Guid.Parse("ae2d605e-2392-4a86-b3a2-bf75c486f311")
                 }
             };
             return tagList;

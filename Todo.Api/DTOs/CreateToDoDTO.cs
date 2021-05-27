@@ -15,7 +15,6 @@ namespace Todo.Api.DTOs
         
         [Range(0, 3)]
         public int Priority { get; init; }
-        [Required]
         public Guid FkTagId { get; init; }
 
         [Required]

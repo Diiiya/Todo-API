@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Todo.Api.DTOs
@@ -12,5 +13,8 @@ namespace Todo.Api.DTOs
         [Required]
         [StringLength(10, MinimumLength = 2)] 
         public string TagColor { get; init; }
+
+        [Required]
+        public Guid FkUserId { get; init; }
     }
 }

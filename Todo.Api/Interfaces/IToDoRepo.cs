@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Todo.Api.DTOs;
 using Todo.Api.Models;
 
 namespace Todo.Api.Interfaces
