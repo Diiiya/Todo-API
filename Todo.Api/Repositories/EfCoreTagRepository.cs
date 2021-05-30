@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Todo.Api.Models;
 using Todo.Api.Interfaces;
+using System.Linq;
 
 namespace Todo.Api.Data.EfCore
 {
@@ -21,6 +22,13 @@ namespace Todo.Api.Data.EfCore
         public async Task<Tag> Get(Guid id)
         {
             return await context.Set<Tag>().FindAsync(id);
+        }
+        public async Task<List<Tag>> GetAllTagsByUser(Guid userId)
+        {
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            var allTags = await context.Set<Tag>().Where(tag => tag.FkUserId == userId).ToListAsync();
+
+            return allTags;
         }
         public async Task<Tag> Add(Tag entity)
         {
