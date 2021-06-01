@@ -17,7 +17,7 @@ using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase

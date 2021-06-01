@@ -64,7 +64,6 @@ namespace Todo.Api.Controllers
                     Description = createToDoDTO.Description,
                     DateTime = createToDoDTO.DateTime,
                     Location = createToDoDTO.Location,
-                    Done = false,
                     Priority = createToDoDTO.Priority,
                     FkTagId = createToDoDTO.FkTagId,
                     FkUserId = createToDoDTO.FkUserId
@@ -78,7 +77,6 @@ namespace Todo.Api.Controllers
                     Description = createToDoDTO.Description,
                     DateTime = createToDoDTO.DateTime,
                     Location = createToDoDTO.Location,
-                    Done = false,
                     Priority = createToDoDTO.Priority,
                     FkUserId = createToDoDTO.FkUserId
                 };
@@ -105,9 +103,28 @@ namespace Todo.Api.Controllers
                 Description = toDoDTO.Description,
                 DateTime = toDoDTO.DateTime,
                 Location = toDoDTO.Location,
-                Done = toDoDTO.Done,
                 Priority = toDoDTO.Priority,
                 FkUserId = existingToDo.FkUserId
+            };
+
+            await todoRepo.Update(updatedToDO);
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> UpdateToDODoneAsync(Guid id)
+        {
+            ToDo existingToDo = await todoRepo.Get(id);
+
+            if (existingToDo is null)
+            {
+                return NotFound();
+            }
+
+            ToDo updatedToDO = existingToDo with
+            {
+                Done = !existingToDo.Done,
             };
 
             await todoRepo.Update(updatedToDO);
