@@ -14,6 +14,7 @@ using System.Text;
 using Todo.Api.Interfaces;
 using FluentValidation.AspNetCore;
 using Todo.Api.Validators;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Todo.Api
 {
@@ -86,6 +87,13 @@ namespace Todo.Api
                     ValidateAudience = false
                 };
             });
+
+            // returns "healthy" if it can connect to the db and "degraded", if it cannot
+            services.AddHealthChecks()    
+                .AddUrlGroup(new Uri("https://localhost:5001/users"), name: "base URL", failureStatus: HealthStatus.Degraded).AddSqlServer(Configuration.GetConnectionString("DefaultConnection"),    
+                healthQuery: "SELECT 1",    
+                failureStatus: HealthStatus.Degraded,    
+                name: "SQL Server");  
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -111,6 +119,7 @@ namespace Todo.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHealthChecks("/health");
             });
 
             // Should only be called if some static data should be added to the db 
