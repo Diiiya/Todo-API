@@ -41,6 +41,16 @@ namespace Todo.Api.Controllers
             return Ok(tag.TagAsDTO());
         }
 
+        [HttpGet("user/{userId}")]
+        public async Task<IEnumerable<TagDTO>> GetAllTagsByUserAsync(Guid userId)
+        {
+            var allTags = (await tagRepo.GetAllTagsByUser(userId)).Select(tag =>
+            {
+                return tag.TagAsDTO();
+            });
+            return allTags;
+        }
+
         [HttpPost]
         public async Task<ActionResult<TagDTO>> CreateTagAsync(CreateTagDTO tag)
         {

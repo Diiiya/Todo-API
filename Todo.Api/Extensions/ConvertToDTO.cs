@@ -29,6 +29,7 @@ namespace Todo.Api
                 DateTime = todo.DateTime,
                 Location = todo.Location,
                 Priority = todo.Priority,
+                Done = todo.Done,
                 FkTagId = todo.FkTagId,
                 FkUserId = todo.FkUserId,
                 Tag = myTag

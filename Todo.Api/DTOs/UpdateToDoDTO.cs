@@ -12,7 +12,6 @@ namespace Todo.Api.DTOs
         
         [StringLength(255)]
         public string Location { get; init; }
-        public bool Done { get; init; }
         public int Priority { get; init; }
     }
 }
