@@ -44,10 +44,10 @@ namespace Todo.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsersAsync()
         {
             var allUsers = (await userRepo.GetAll()).Select(user => user.AsDTO());
-            return allUsers;
+            return Ok(allUsers);
         }
 
         [HttpGet("{id}")]
@@ -140,7 +140,7 @@ namespace Todo.Api.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult> AuthenticateUserAsync(LoginUserDTO userCredentials)
         {
-            IEnumerable<UserDTO> users = (await userRepo.GetAll()).Select(user => user.AsDTO());
+            IEnumerable<User> users = await userRepo.GetAll();
 
             var authenticatedUser = users.FirstOrDefault(u =>
                 (u.Username == userCredentials.Login || u.Email == userCredentials.Login) &&
@@ -150,42 +150,31 @@ namespace Todo.Api.Controllers
             {
                 return BadRequest("Wrong credentials!");
             }
-            Token myObjT = CreateToken(authenticatedUser.Id);
+            string myObjT = CreateToken(authenticatedUser.Id);
             if (myObjT is null)
                 return Unauthorized();
-            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-            var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
-            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
-            return Ok(deserialized);
+
+            return Ok(myObjT);
         }
 
-        private Token CreateToken(Guid userId)
+        private string CreateToken(Guid userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-            }),
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                }),
                 Expires = DateTime.UtcNow.AddHours(24),
-                SigningCredentials =
-                        new SigningCredentials(
-                            new SymmetricSecurityKey(tokenKey),
-                            SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
+                                                            SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-
-
             string myToken = tokenHandler.WriteToken(token);
-            Token myobjT = new()
-            {
-                CreatedToken = myToken
-            };
-
-            return myobjT;
+            return myToken;
         }
     }
 }

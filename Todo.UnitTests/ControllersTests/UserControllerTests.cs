@@ -69,7 +69,7 @@ namespace Todo.UnitTests.ControllersTests
             return new() 
             {
                 Id = Guid.NewGuid(),
-                Username = Guid.NewGuid().ToString(),
+                Username = "username666",
                 Email = Guid.NewGuid().ToString() + "@mail.com",
                 Password = passwordHasher.hashPass("lala123"),
                 CreatedDate = DateTimeOffset.UtcNow,
@@ -97,7 +97,7 @@ namespace Todo.UnitTests.ControllersTests
             // Assert
             var createdUser = (result.Result as CreatedAtActionResult).Value as UserDTO;
 
-            // The following would work if the password was not being hashed differently
+            // Fails
             // userToCreate.Should().BeEquivalentTo(
             //     createdUser,
             //     options => options.ComparingByMembers<UserDTO>().ExcludingMissingMembers()
@@ -228,9 +228,7 @@ namespace Todo.UnitTests.ControllersTests
 
         //     // Assert
         //     result.Should().BeOfType<OkObjectResult>();
-        // }
-
-        
+        // }        
 
     }
 }
