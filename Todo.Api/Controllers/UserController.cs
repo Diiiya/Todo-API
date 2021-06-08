@@ -17,7 +17,7 @@ using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase
@@ -44,10 +44,10 @@ namespace Todo.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
             var allUsers = (await userRepo.GetAll()).Select(user => user.AsDTO());
-            return Ok(allUsers);
+            return allUsers;
         }
 
         [HttpGet("{id}")]
@@ -77,20 +77,7 @@ namespace Todo.Api.Controllers
                 Deleted = false
             };
 
-            IEnumerable<User> users = Enumerable.Empty<User>();
-            users = await userRepo.GetAll();
-            var usernameExists = users.FirstOrDefault(u => (u.Username == userDTO.Username));
-            var emailExists = users.FirstOrDefault(u => (u.Email == userDTO.Email));                   
-
-            if (usernameExists != null)
-            {
-               return BadRequest("Username is already registered!");
-            }
-
-            if (emailExists != null)
-            {
-                return BadRequest("Email is already registered!");
-            }
+            var myCreatedEntity = await userRepo.Add(newUser);
 
             return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
@@ -153,7 +140,7 @@ namespace Todo.Api.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult> AuthenticateUserAsync(LoginUserDTO userCredentials)
         {
-            IEnumerable<User> users = await userRepo.GetAll();
+            IEnumerable<UserDTO> users = (await userRepo.GetAll()).Select(user => user.AsDTO());
 
             var authenticatedUser = users.FirstOrDefault(u =>
                 (u.Username == userCredentials.Login || u.Email == userCredentials.Login) &&
@@ -163,31 +150,42 @@ namespace Todo.Api.Controllers
             {
                 return BadRequest("Wrong credentials!");
             }
-            string myObjT = CreateToken(authenticatedUser.Id);
+            Token myObjT = CreateToken(authenticatedUser.Id);
             if (myObjT is null)
                 return Unauthorized();
-
-            return Ok(myObjT);
+            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
+            var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
+            return Ok(deserialized);
         }
 
-        private string CreateToken(Guid userId)
+        private Token CreateToken(Guid userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, userId.ToString())
-                }),
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            }),
                 Expires = DateTime.UtcNow.AddHours(24),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
-                                                            SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials =
+                        new SigningCredentials(
+                            new SymmetricSecurityKey(tokenKey),
+                            SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
+
             string myToken = tokenHandler.WriteToken(token);
-            return myToken;
+            Token myobjT = new()
+            {
+                CreatedToken = myToken
+            };
+
+            return myobjT;
         }
     }
 }
