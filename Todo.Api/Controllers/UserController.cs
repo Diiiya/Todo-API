@@ -17,7 +17,7 @@ using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase
@@ -76,6 +76,20 @@ namespace Todo.Api.Controllers
                 CreatedDate = DateTimeOffset.UtcNow,
                 Deleted = false
             };
+
+            var users = await userRepo.GetAll();
+            var usernameExists = users.FirstOrDefault(u => (u.Username == userDTO.Username));
+            var emailExists = users.FirstOrDefault(u => (u.Email == userDTO.Email));                   
+
+            if (usernameExists != null)
+            {
+               return BadRequest("Username is already registered!");
+            }
+
+            if (emailExists != null)
+            {
+                return BadRequest("Email is already registered!");
+            }
 
             var myCreatedEntity = await userRepo.Add(newUser);
 
@@ -140,7 +154,7 @@ namespace Todo.Api.Controllers
         [HttpPost("authenticate")]
         public async Task<ActionResult> AuthenticateUserAsync(LoginUserDTO userCredentials)
         {
-            IEnumerable<UserDTO> users = (await userRepo.GetAll()).Select(user => user.AsDTO());
+            var users = await userRepo.GetAll();
 
             var authenticatedUser = users.FirstOrDefault(u =>
                 (u.Username == userCredentials.Login || u.Email == userCredentials.Login) &&
@@ -150,16 +164,13 @@ namespace Todo.Api.Controllers
             {
                 return BadRequest("Wrong credentials!");
             }
-            Token myObjT = CreateToken(authenticatedUser.Id);
+            string myObjT = CreateToken(authenticatedUser.Id);
             if (myObjT is null)
                 return Unauthorized();
-            JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web);
-            var serialized = JsonSerializer.Serialize(myObjT, _jsonOptions);
-            var deserialized = JsonSerializer.Deserialize<Token>(serialized, _jsonOptions);
-            return Ok(deserialized);
+            return Ok(myObjT);
         }
 
-        private Token CreateToken(Guid userId)
+        private string CreateToken(Guid userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
@@ -177,15 +188,8 @@ namespace Todo.Api.Controllers
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-
-
             string myToken = tokenHandler.WriteToken(token);
-            Token myobjT = new()
-            {
-                CreatedToken = myToken
-            };
-
-            return myobjT;
+            return myToken;
         }
     }
 }
