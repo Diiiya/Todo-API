@@ -11,8 +11,7 @@ namespace Todo.Api
             {
                 Id = user.Id,
                 Username = user.Username,
-                Email = user.Email,
-                Password = user.Password
+                Email = user.Email
             };
         }
 
