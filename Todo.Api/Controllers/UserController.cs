@@ -17,7 +17,7 @@ using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("users")]
     public class UserController : ControllerBase
@@ -77,7 +77,20 @@ namespace Todo.Api.Controllers
                 Deleted = false
             };
 
-            var myCreatedEntity = await userRepo.Add(newUser);
+            IEnumerable<User> users = Enumerable.Empty<User>();
+            users = await userRepo.GetAll();
+            var usernameExists = users.FirstOrDefault(u => (u.Username == userDTO.Username));
+            var emailExists = users.FirstOrDefault(u => (u.Email == userDTO.Email));                   
+
+            if (usernameExists != null)
+            {
+               return BadRequest("Username is already registered!");
+            }
+
+            if (emailExists != null)
+            {
+                return BadRequest("Email is already registered!");
+            }
 
             return CreatedAtAction(nameof(GetUserAsync), new { id = newUser.Id }, newUser.AsDTO());
         }
