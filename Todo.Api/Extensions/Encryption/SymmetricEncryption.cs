@@ -11,8 +11,9 @@ namespace Todo.Api.Extensions.Encryption
     {
         public static string EncryptString(string key, string plainText)  
         {  
-            byte[] iv = new byte[16];  
+            // byte[] iv = new byte[16];  
             byte[] array;  
+            var iv = Encoding.UTF8.GetBytes("e16ce913a20dadb8");
   
             using (Aes aes = Aes.Create())  
             {  
@@ -40,7 +41,8 @@ namespace Todo.Api.Extensions.Encryption
   
         public static string DecryptString(string key, string cipherText)  
         {  
-            byte[] iv = new byte[16];  
+            // byte[] iv = new byte[16]; 
+            var iv = Encoding.UTF8.GetBytes("e16ce913a20dadb8"); 
             byte[] buffer = Convert.FromBase64String(cipherText);  
   
             using (Aes aes = Aes.Create())  
