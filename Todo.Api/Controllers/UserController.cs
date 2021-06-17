@@ -12,7 +12,6 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using Todo.Api.Extensions;
-using System.Text.Json;
 using Todo.Api.Interfaces;
 
 namespace Todo.Api.Controllers
@@ -53,14 +52,23 @@ namespace Todo.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUserAsync(Guid id)
         {
-            var user = await userRepo.Get(id);
-
-            if (user is null)
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == id.ToString())
             {
-                return NotFound();
+                var user = await userRepo.Get(id);
+
+                if (user is null)
+                {
+                    return NotFound();
+                }
+
+                return user.AsDTO();
+            }
+            else
+            {
+                return Unauthorized();
             }
 
-            return user.AsDTO();
         }
 
         [AllowAnonymous]
@@ -79,11 +87,11 @@ namespace Todo.Api.Controllers
 
             var users = await userRepo.GetAll();
             var usernameExists = users.FirstOrDefault(u => (u.Username == userDTO.Username));
-            var emailExists = users.FirstOrDefault(u => (u.Email == userDTO.Email));                   
+            var emailExists = users.FirstOrDefault(u => (u.Email == userDTO.Email));
 
             if (usernameExists != null)
             {
-               return BadRequest("Username is already registered!");
+                return BadRequest("Username is already registered!");
             }
 
             if (emailExists != null)
@@ -99,55 +107,72 @@ namespace Todo.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateUserAsync(Guid id, UpdateUserDTO userDTO)
         {
-            User existingUser = await userRepo.Get(id);
-
-            if (existingUser is null)
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == id.ToString())
             {
-                return NotFound();
-            }
+                User existingUser = await userRepo.Get(id);
 
-            if (passwordHasher.VerifyPassword(existingUser.Password, userDTO.CurrentPassword) == false) 
+                if (existingUser is null)
+                {
+                    return NotFound();
+                }
+
+                if (passwordHasher.VerifyPassword(existingUser.Password, userDTO.CurrentPassword) == false)
+                {
+                    return Unauthorized();
+                }
+
+                var passwordValue = "";
+                if (userDTO.NewPassword != null)
+                {
+                    passwordValue = passwordHasher.hashPass(userDTO.NewPassword);
+                }
+                else
+                {
+                    passwordValue = existingUser.Password;
+                }
+
+                User updatedUser = existingUser with
+                {
+                    Id = existingUser.Id,
+                    Username = existingUser.Username,
+                    Email = userDTO.Email,
+                    Password = passwordValue,
+                    CreatedDate = existingUser.CreatedDate,
+                    Deleted = existingUser.Deleted
+                };
+
+                await userRepo.Update(updatedUser);
+                return NoContent();
+
+            }
+            else
             {
                 return Unauthorized();
             }
-
-            var passwordValue = "";
-            if (userDTO.NewPassword != null) 
-            {
-                passwordValue = passwordHasher.hashPass(userDTO.NewPassword);
-            }
-            else 
-            {
-                passwordValue = existingUser.Password;
-            }
-
-            User updatedUser = existingUser with
-            {
-                Id = existingUser.Id,
-                Username = existingUser.Username,
-                Email = userDTO.Email,
-                Password = passwordValue,
-                CreatedDate = existingUser.CreatedDate,
-                Deleted = existingUser.Deleted
-            };
-
-            await userRepo.Update(updatedUser);
-            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUserAsync(Guid id)
         {
-            User existingUser = await userRepo.Get(id);
-
-            if (existingUser is null)
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == id.ToString())
             {
-                return NotFound();
+                User existingUser = await userRepo.Get(id);
+
+                if (existingUser is null)
+                {
+                    return NotFound();
+                }
+
+                await userRepo.Delete(id);
+
+                return NoContent();
             }
-
-            await userRepo.Delete(id);
-
-            return NoContent();
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [AllowAnonymous]

@@ -6,10 +6,12 @@ using Todo.Api.DTOs;
 using Todo.Api.Models;
 using System.Threading.Tasks;
 using Todo.Api.Interfaces;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Todo.Api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("tags")]
     public class TagController : ControllerBase
@@ -42,29 +44,45 @@ namespace Todo.Api.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IEnumerable<TagDTO>> GetAllTagsByUserAsync(Guid userId)
+        public async Task<ActionResult<IEnumerable<TagDTO>>> GetAllTagsByUserAsync(Guid userId)
         {
-            var allTags = (await tagRepo.GetAllTagsByUser(userId)).Select(tag =>
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == userId.ToString())
             {
-                return tag.TagAsDTO();
-            });
-            return allTags;
+                var allTags = (await tagRepo.GetAllTagsByUser(userId)).Select(tag =>
+                {
+                    return tag.TagAsDTO();
+                });
+                return Ok(allTags);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<TagDTO>> CreateTagAsync(CreateTagDTO tag)
         {
-            Tag newTag = new()
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == tag.FkUserId.ToString())
             {
-                Id = Guid.NewGuid(),
-                TagName = tag.TagName,
-                TagColor = tag.TagColor,
-                FkUserId = tag.FkUserId
-            };
+                Tag newTag = new()
+                {
+                    Id = Guid.NewGuid(),
+                    TagName = tag.TagName,
+                    TagColor = tag.TagColor,
+                    FkUserId = tag.FkUserId
+                };
 
-            var myCreatedEntity = await tagRepo.Add(newTag);
+                var myCreatedEntity = await tagRepo.Add(newTag);
 
-            return CreatedAtAction(nameof(GetTagAsync), new { id = newTag.Id }, newTag.TagAsDTO());
+                return CreatedAtAction(nameof(GetTagAsync), new { id = newTag.Id }, newTag.TagAsDTO());
+            }
+            else
+            {
+                return Unauthorized();
+            }
 
         }
 
@@ -72,38 +90,54 @@ namespace Todo.Api.Controllers
         public async Task<ActionResult> UpdateTagAsync(Guid id, CreateTagDTO tag)
         {
             Tag existingTag = await tagRepo.Get(id);
-
-            if (existingTag is null)
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == existingTag.FkUserId.ToString())
             {
-                return NotFound();
+                if (existingTag is null)
+                {
+                    return NotFound();
+                }
+
+                Tag updatedTag = existingTag with
+                {
+                    Id = existingTag.Id,
+                    TagName = tag.TagName,
+                    TagColor = tag.TagColor,
+                    FkUserId = existingTag.FkUserId
+                };
+
+                await tagRepo.Update(updatedTag);
+
+                return NoContent();
+            }
+            else
+            {
+                return Unauthorized();
             }
 
-            Tag updatedTag = existingTag with
-            {
-                Id = existingTag.Id,
-                TagName = tag.TagName,
-                TagColor = tag.TagColor,
-                FkUserId = existingTag.FkUserId
-            };
-
-            await tagRepo.Update(updatedTag);
-
-            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTagAsync(Guid id)
         {
             Tag existingTag = await tagRepo.Get(id);
-
-            if (existingTag is null)
+            string userIdFromToken = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userIdFromToken == existingTag.FkUserId.ToString())
             {
-                return NotFound();
+                if (existingTag is null)
+                {
+                    return NotFound();
+                }
+
+                await tagRepo.Delete(id);
+
+                return NoContent();
+            }
+            else
+            {
+                return Unauthorized();
             }
 
-            await tagRepo.Delete(id);
-
-            return NoContent();
         }
     }
 }
